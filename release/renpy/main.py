@@ -1,4 +1,4 @@
-# Copyright 2004-2013 Tom Rothamel <pytom@bishoujo.us>
+# Copyright 2004-2014 Tom Rothamel <pytom@bishoujo.us>
 #
 # Permission is hereby granted, free of charge, to any person
 # obtaining a copy of this software and associated documentation files
@@ -25,7 +25,6 @@ import os
 import sys
 import time
 import zipfile
-import subprocess
 import __main__
 
 
@@ -160,6 +159,8 @@ def main():
 
     # Set up variants.
     choose_variants()
+    renpy.display.touch = "touch" in renpy.config.variants
+
 
     # Note the game directory.
     game.basepath = renpy.config.gamedir
@@ -220,7 +221,7 @@ def main():
 
     # Set up error handling.
     renpy.exports.load_module("_errorhandling")
-    renpy.style.build_styles(early=True)
+    renpy.style.build_styles()
 
     # Load all .rpy files.
     renpy.game.script.load_script() # sets renpy.game.script.
@@ -328,13 +329,6 @@ def main():
                 finally:
                     restart = (renpy.config.end_game_transition, "_invoke_main_menu", "_main_menu")
                     renpy.persistent.update(True)
-
-            except game.QuitException, e:
-
-                if e.relaunch:
-                    subprocess.Popen([sys.executable, "-EO"] + sys.argv)
-
-                break
 
             except game.FullRestartException, e:
                 restart = e.reason

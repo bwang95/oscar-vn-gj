@@ -1,5 +1,5 @@
 #cython: profile=False
-# Copyright 2004-2013 Tom Rothamel <pytom@bishoujo.us>
+# Copyright 2004-2014 Tom Rothamel <pytom@bishoujo.us>
 #
 # Permission is hereby granted, free of charge, to any person
 # obtaining a copy of this software and associated documentation files
@@ -834,7 +834,7 @@ cdef class Render:
         this focus is assumed to be the singular full-screen focus.
         """
 
-        if mask is not None and mask is not self:
+        if isinstance(mask, Render) and mask is not self:
             self.depends_on(mask)
 
         t = (d, arg, x, y, w, h, mx, my, mask)
@@ -929,8 +929,12 @@ cdef class Render:
                     if self.forward:
                         cx, cy = self.forward.transform(cx, cy)
 
-                    if mask.is_pixel_opaque(cx, cy):
-                        rv = d, arg
+                    if isinstance(mask, Render):
+                        if mask.is_pixel_opaque(cx, cy):
+                            rv = d, arg
+                    else:
+                        if mask(cx, cy):
+                            rv = d, arg
 
                 elif xo <= x < xo + w and yo <= y < yo + h:
                     rv = d, arg
@@ -973,10 +977,16 @@ cdef class Render:
         if x < 0 or y < 0 or x >= self.width or y >= self.height:
             return rv
 
+        is_screen = False
+
         if depth is not None:
             for d in self.render_of:
                 rv.append((depth, self.width, self.height, d))
                 depth += 1
+
+                if isinstance(d, renpy.display.screen.ScreenDisplayable):
+                    is_screen = True
+
         elif self.layer_name in layers:
             depth = 0
 
@@ -990,8 +1000,13 @@ cdef class Render:
             if self.forward:
                 cx, cy = self.forward.transform(cx, cy)
 
-            cf = child.main_displayables_at_point(cx, cy, layers, depth)
-            rv.extend(cf)
+            if is_screen:
+                # Ignore the fixed at the root of every screen.
+                cf = child.main_displayables_at_point(cx, cy, layers, depth - 1)
+                rv.extend(cf[1:])
+            else:
+                cf = child.main_displayables_at_point(cx, cy, layers, depth)
+                rv.extend(cf)
 
         return rv
 

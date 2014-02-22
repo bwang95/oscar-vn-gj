@@ -1,4 +1,4 @@
-# Copyright 2004-2013 Tom Rothamel <pytom@bishoujo.us>
+# Copyright 2004-2014 Tom Rothamel <pytom@bishoujo.us>
 #
 # Permission is hereby granted, free of charge, to any person
 # obtaining a copy of this software and associated documentation files
@@ -94,6 +94,55 @@ class absolute(float):
     __slots__ = [ ]
 
 
+def place(width, height, sw, sh, placement):
+    """
+    Performs the Ren'Py placement algorithm.
+
+    `width`, `height`
+        The width and height of the area the image will be
+        placed in.
+
+    `size`
+        The size of the image to be placed.
+
+    `placement`
+        The tuple returned by Displayable.get_placement().
+    """
+
+    xpos, ypos, xanchor, yanchor, xoffset, yoffset, _subpixel = placement
+
+    if xpos is None:
+        xpos = 0
+    if ypos is None:
+        ypos = 0
+    if xanchor is None:
+        xanchor = 0
+    if yanchor is None:
+        yanchor = 0
+    if xoffset is None:
+        xoffset = 0
+    if yoffset is None:
+        yoffset = 0
+
+    # We need to use type, since isinstance(absolute(0), float).
+    if xpos.__class__ is float:
+        xpos *= width
+
+    if xanchor.__class__ is float:
+        xanchor *= sw
+
+    x = xpos + xoffset - xanchor
+
+    if ypos.__class__ is float:
+        ypos *= height
+
+    if yanchor.__class__ is float:
+        yanchor *= sh
+
+    y = ypos + yoffset - yanchor
+
+    return x, y
+
 class Displayable(renpy.object.Object):
     """
     The base class for every object in Ren'Py that can be
@@ -112,7 +161,6 @@ class Displayable(renpy.object.Object):
     # get_placement can be called at any time, so can't
     # assume anything.
 
-    activated = False
     focusable = False
     full_focus_name = None
     role = ''
@@ -123,10 +171,16 @@ class Displayable(renpy.object.Object):
     # Can we change our look in response to transform_events?
     transform_event_responder = False
 
-    def __init__(self, focus=None, default=False, style='default', **properties): # W0231
-        self.style = renpy.style.Style(style, properties, heavy=True)
+    def __init__(self, focus=None, default=False, style='default', **properties):
+        self.style = renpy.style.Style(style, properties) # @UndefinedVariable
         self.focus_name = focus
         self.default = default
+
+    def __unicode__(self):
+        return self.__class__.__name__
+
+    def __repr__(self):
+        return "<{} at {:x}>".format(unicode(self), id(self))
 
     def find_focusable(self, callback, focus_name):
 
@@ -147,20 +201,18 @@ class Displayable(renpy.object.Object):
         Called to indicate that this widget has the focus.
         """
 
-        if not self.activated:
-            self.set_style_prefix(self.role + "hover_", True)
+        self.set_style_prefix(self.role + "hover_", True)
 
-        if not default and not self.activated:
-            if self.style.sound:
-                renpy.audio.music.play(self.style.sound, channel="sound")
+        if not default:
+            if self.style.hover_sound:
+                renpy.audio.music.play(self.style.hover_sound, channel="sound")
 
     def unfocus(self, default=False):
         """
         Called to indicate that this widget has become unfocused.
         """
 
-        if not self.activated:
-            self.set_style_prefix(self.role + "idle_", True)
+        self.set_style_prefix(self.role + "idle_", True)
 
     def is_focused(self):
 
@@ -281,70 +333,41 @@ class Displayable(renpy.object.Object):
 
     def place(self, dest, x, y, width, height, surf, main=True):
         """
-        This draws this Displayable onto a destination surface, using
-        the placement style information returned by this object's
-        get_placement() method.
+        This places a render (which must be of this displayable)
+        within a bounding area. Returns an (x, y) tuple giving the location
+        the displayable was placed at.
 
-        @param dest: The surface that this displayable will be drawn
-        on.
+        `dest`
+            If not None, the `surf` will be blitted to `dest` at the
+            computed coordinates.
 
-        @param x: The minimum x coordinate on this surface that this
-        Displayable will be drawn to.
+        `x`, `y`, `width`, `height`
+            The bounding area.
 
-        @param y: The minimum y coordinate on this surface that this
-        displayable will be drawn to.
+        `surf`
+            The render to place.
 
-        @param width: The width of the area allocated to this
-        Displayable.
-
-        @param height: The height of the area allocated to this
-        Displayable.
-
-        @param surf: The surface returned by a previous call to
-        self.render().
+        `main`
+            This is passed to Render.blit().
         """
 
-        xpos, ypos, xanchor, yanchor, xoffset, yoffset, subpixel = self.get_placement()
+        placement = self.get_placement()
+        subpixel = placement[6]
 
-        if xpos is None:
-            xpos = 0
-        if ypos is None:
-            ypos = 0
-        if xanchor is None:
-            xanchor = 0
-        if yanchor is None:
-            yanchor = 0
-        if xoffset is None:
-            xoffset = 0
-        if yoffset is None:
-            yoffset = 0
+        xpos, ypos = place(width, height, surf.width, surf.height, placement)
 
-        # We need to use type, since isinstance(absolute(0), float).
-        if xpos.__class__ is float:
-            xpos *= width
+        xpos += x
+        ypos += y
 
-        if xanchor.__class__ is float:
-            xanchor *= surf.width
-
-        xpos += x + xoffset - xanchor
-
-        # y
-
-        if ypos.__class__ is float:
-            ypos *= height
-
-        if yanchor.__class__ is float:
-            yanchor *= surf.height
-
-        ypos += y + yoffset - yanchor
+        pos = (xpos, ypos)
 
         if dest is not None:
             if subpixel:
-                dest.subpixel_blit(surf, (xpos, ypos), main, main, None)
+                dest.subpixel_blit(surf, pos, main, main, None)
             else:
-                dest.blit(surf, (xpos, ypos), main, main, None)
+                dest.blit(surf, pos, main, main, None)
 
-        return xpos, ypos
+        return pos
 
     def set_transform_event(self, event):
         """
@@ -835,6 +858,9 @@ class SceneLists(renpy.object.Object):
         totally wiped out.
         """
 
+        if not layer in self.layers:
+            return
+
         if not hide:
             self.layers[layer] = [ ]
 
@@ -957,7 +983,7 @@ class SceneLists(renpy.object.Object):
 
     def get_displayable_by_name(self, layer, name):
         """
-        Returns the displayable on the layer with the given tag, or None
+        Returns the displayable on the layer with the given name, or None
         if no such displayable exists. Note that this will usually return
         a Transform.
         """
@@ -966,11 +992,47 @@ class SceneLists(renpy.object.Object):
             raise Exception("Unknown layer %r." % layer)
 
         for sle in self.layers[layer]:
-
             if sle.name == name:
                 return sle.displayable
 
         return None
+
+    def get_image_bounds(self, layer, tag, width, height):
+        """
+        Implements renpy.get_image_bounds().
+        """
+
+        if layer not in self.layers:
+            raise Exception("Unknown layer %r." % layer)
+
+        for sle in self.layers[layer]:
+            if sle.tag == tag:
+                break
+        else:
+            return None
+
+        now = get_time()
+
+        if sle.show_time is not None:
+            st = now - sle.show_time
+        else:
+            st = 0
+
+        if sle.animation_time is not None:
+            at = now - sle.animation_time
+        else:
+            at = 0
+
+        surf = renpy.display.render.render(sle.displayable, width, height, st, at)
+
+        sw = surf.width
+        sh = surf.height
+
+        x, y = place(width, height, sw, sh, sle.displayable.get_placement())
+
+        surf.kill()
+
+        return (x, y, sw, sh)
 
 
 def scene_lists(index=-1):
@@ -981,6 +1043,44 @@ def scene_lists(index=-1):
 
     return renpy.game.context(index).scene_lists
 
+
+class MouseMove(object):
+    """
+    This contains information about the current mouse move.
+    """
+
+    def __init__(self, x, y, duration):
+        self.start = get_time()
+
+        if duration is not None:
+            self.duration = duration
+        else:
+            self.duration = 0
+
+        self.start_x, self.start_y = renpy.display.draw.get_mouse_pos()
+
+        self.end_x = x
+        self.end_y = y
+
+    def perform(self):
+        """
+        Performs the mouse move. Returns True if this should be called
+        again, or False if the move has finished.
+        """
+
+        elapsed = get_time() - self.start
+
+        if elapsed >= self.duration:
+            renpy.display.draw.set_mouse_pos(self.end_x, self.end_y)
+            return False
+
+        done = 1.0 * elapsed / self.duration
+
+        x = int(self.start_x + done * (self.end_x - self.start_x))
+        y = int(self.start_y + done * (self.end_y - self.start_y))
+
+        renpy.display.draw.set_mouse_pos(x, y)
+        return True
 
 class Interface(object):
     """
@@ -1034,7 +1134,11 @@ class Interface(object):
     """
 
     def __init__(self):
+
+        # PNG data and the surface for the current file screenshot.
         self.screenshot = None
+        self.screenshot_surface = None
+
         self.old_scene = { }
         self.transition = { }
         self.ongoing_transition = { }
@@ -1078,6 +1182,10 @@ class Interface(object):
 
         # Are we in fullscren mode?
         self.fullscreen = False
+
+        # Should we ignore the rest of the current touch? Used to ignore the
+        # rest of a mousepress after a longpress occurs.
+        self.ignore_touch = False
 
         for layer in renpy.config.layers + renpy.config.top_layers:
             if layer in renpy.config.layer_clipping:
@@ -1188,6 +1296,10 @@ class Interface(object):
 
         # The background screenshot surface.
         self.bgscreenshot_surface = None
+
+        # Mouse move. If not None, information about the current mouse
+        # move.
+        self.mouse_move = None
 
         renpy.display.emulator.init_emulator()
 
@@ -1456,6 +1568,10 @@ class Interface(object):
         surf = renpy.display.scale.smoothscale(surf, scale)
         surf = surf.convert()
 
+        renpy.display.render.mutated_surface(surf)
+
+        self.screenshot_surface = surf
+
         sio = cStringIO.StringIO()
         renpy.display.module.save_png(surf, sio, 0)
         self.screenshot = sio.getvalue()
@@ -1471,24 +1587,6 @@ class Interface(object):
             self.bgscreenshot_needed = False
             self.bgscreenshot_surface = renpy.display.draw.screenshot(self.surftree, self.fullscreen_video)
             self.bgscreenshot_event.set()
-
-    def save_screenshot(self, filename):
-        """
-        Saves a full-size screenshot in the given filename.
-        """
-
-        window = renpy.display.draw.screenshot(self.surftree, self.fullscreen_video)
-
-        if renpy.config.screenshot_crop:
-            window = window.subsurface(renpy.config.screenshot_crop)
-
-        try:
-            renpy.display.scale.image_save_unscaled(window, filename)
-        except:
-            if renpy.config.debug:
-                raise
-            pass
-
 
     def get_screenshot(self):
         """
@@ -1512,11 +1610,34 @@ class Interface(object):
         """
 
         self.screenshot = None
+        self.screenshot_surface = None
+
+
+    def save_screenshot(self, filename):
+        """
+        Saves a full-size screenshot in the given filename.
+        """
+
+        window = renpy.display.draw.screenshot(self.surftree, self.fullscreen_video)
+
+        if renpy.config.screenshot_crop:
+            window = window.subsurface(renpy.config.screenshot_crop)
+
+        try:
+            renpy.display.scale.image_save_unscaled(window, filename)
+        except:
+            if renpy.config.debug:
+                raise
+            pass
+
 
 
     def show_window(self):
 
         if not renpy.store._window:
+            return
+
+        if not renpy.game.preferences.show_empty_window:
             return
 
         if renpy.game.context().scene_lists.shown_window:
@@ -1546,7 +1667,7 @@ class Interface(object):
         be transitioning from.
         """
 
-        renpy.exports.say_attributes = None
+        renpy.game.context().say_attributes = None
 
         # Show the window, if that's necessary.
         self.show_window()
@@ -1732,6 +1853,15 @@ class Interface(object):
 
         return False, x, y, tex
 
+    def set_mouse_pos(self, x, y, duration):
+        """
+        Sets the mouse position. Duration can be a number of seconds or
+        None.
+        """
+
+        self.mouse_move = MouseMove(x, y, duration)
+        self.force_redraw = True
+
     def drawn_since(self, seconds_ago):
         """
         Returns true if the screen has been drawn in the last `seconds_ago`,
@@ -1752,6 +1882,9 @@ class Interface(object):
 
             # The game has to be saved.
             renpy.loadsave.save("_reload-1")
+
+            # So does the persistent data.
+            renpy.persistent.update(True)
 
             android.wait_for_resume()
 
@@ -1815,6 +1948,15 @@ class Interface(object):
         except:
             pass
 
+    def after_longpress(self):
+        """
+        Called after a longpress, to ignore the mouse button release.
+        """
+
+        self.ignore_touch = True
+        renpy.display.focus.mouse_handler(None, -1, -1, default=False)
+
+
     def interact(self, clear=True, suppress_window=False, **kwargs):
         """
         This handles an interaction, restarting it if necessary. All of the
@@ -1842,8 +1984,6 @@ class Interface(object):
         self.preloads = [ ]
 
         try:
-            renpy.game.after_rollback = False
-
             for i in renpy.config.start_interact_callbacks:
                 i()
 
@@ -2131,6 +2271,9 @@ class Interface(object):
         # Have we drawn a frame yet?
         video_frame_drawn = False
 
+        # We're no longer after rollback.
+        renpy.game.after_rollback = False
+
         # This try block is used to force cleanup even on termination
         # caused by an exception propagating through this function.
         try:
@@ -2185,7 +2328,13 @@ class Interface(object):
 
                     if first_pass and self.last_event:
                         x, y = renpy.display.draw.get_mouse_pos()
-                        renpy.display.focus.mouse_handler(self.last_event, x, y, default=False)
+                        ev, x, y = renpy.display.emulator.emulator(self.last_event, x, y)
+
+                        if self.ignore_touch:
+                            x = -1
+                            y = -1
+
+                        renpy.display.focus.mouse_handler(None, x, y, default=False)
 
                     needs_redraw = False
                     first_pass = False
@@ -2193,6 +2342,11 @@ class Interface(object):
                     pygame.time.set_timer(REDRAW, 0)
                     pygame.event.clear([REDRAW])
                     old_redraw_time = None
+
+                # Move the mouse, if necessary.
+                if self.mouse_move is not None:
+                    if not self.mouse_move.perform():
+                        self.mouse_move = None
 
                 # Draw the mouse, if it needs drawing.
                 renpy.display.draw.update_mouse()
@@ -2283,7 +2437,7 @@ class Interface(object):
 
                 renpy.persistent.check_update()
 
-                if needs_redraw or renpy.display.video.playing():
+                if needs_redraw or self.mouse_move or renpy.display.video.playing():
                     ev = self.event_poll()
                 else:
                     ev = self.event_wait()
@@ -2346,11 +2500,15 @@ class Interface(object):
 
                     continue
 
-                if ev.type == pygame.MOUSEMOTION or \
-                        ev.type == pygame.MOUSEBUTTONDOWN or \
-                        ev.type == pygame.MOUSEBUTTONUP:
+                # If we're ignoring touch events, and get a mouse up, stop
+                # ignoring those events.
+                if self.ignore_touch and \
+                    ev.type == pygame.MOUSEBUTTONUP and \
+                    ev.button == 1:
 
-                    self.mouse_event_time = renpy.display.core.get_time()
+                    self.ignore_touch = False
+                    continue
+
 
                 # Merge mousemotion events.
                 if ev.type == pygame.MOUSEMOTION:
@@ -2360,6 +2518,16 @@ class Interface(object):
 
                     if renpy.windows:
                         self.focused = True
+
+                # Handle mouse event time, and ignoring touch.
+                if ev.type == pygame.MOUSEMOTION or \
+                        ev.type == pygame.MOUSEBUTTONDOWN or \
+                        ev.type == pygame.MOUSEBUTTONUP:
+
+                    self.mouse_event_time = renpy.display.core.get_time()
+
+                    if self.ignore_touch:
+                        renpy.display.focus.mouse_handler(None, -1, -1, default=False)
 
                 # Handle focus notifications.
                 if ev.type == pygame.ACTIVEEVENT:
@@ -2378,13 +2546,13 @@ class Interface(object):
                 # mouse state as necessary.
                 x, y = renpy.display.draw.mouse_event(ev)
 
-                if not self.focused:
-                    x = -1
-                    y = -1
-
                 ev, x, y = renpy.display.emulator.emulator(ev, x, y)
                 if ev is None:
                     continue
+
+                if not self.focused or self.ignore_touch:
+                    x = -1
+                    y = -1
 
                 # This can set the event to None, to ignore it.
                 ev = renpy.display.joystick.event(ev)
@@ -2400,7 +2568,6 @@ class Interface(object):
 
                     # Handle the event normally.
                     rv = renpy.display.focus.mouse_handler(ev, x, y)
-
 
                     if rv is None:
                         rv = root_widget.event(ev, x, y, 0)
@@ -2443,7 +2610,7 @@ class Interface(object):
 
         finally:
 
-            renpy.exports.say_attributes = None
+            renpy.game.context().say_attributes = None
 
             # Clean out the overlay layers.
             for i in renpy.config.overlay_layers:

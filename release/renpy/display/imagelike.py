@@ -1,4 +1,4 @@
-# Copyright 2004-2013 Tom Rothamel <pytom@bishoujo.us>
+# Copyright 2004-2014 Tom Rothamel <pytom@bishoujo.us>
 #
 # Permission is hereby granted, free of charge, to any person
 # obtaining a copy of this software and associated documentation files
@@ -74,7 +74,7 @@ class Solid(renpy.display.core.Displayable):
 class Frame(renpy.display.core.Displayable):
     """
     :doc: disp_imagelike
-    :args: (image, xborder, yborder, tile=False, **properties)
+    :args: (image, left, top, right=None, bottom=None, tile=False, **properties)
 
     A displayable that resizes an image to fill the available area,
     while preserving the width and height of its borders.  is often
@@ -120,11 +120,17 @@ class Frame(renpy.display.core.Displayable):
             self.top = self.yborder
             self.bottom = self.yborder
 
-    def __init__(self, image, left, top, right=None, bottom=None, bilinear=True, tile=False, **properties):
+    def __init__(self, image, left=None, top=None, right=None, bottom=None, xborder=None, yborder=None, bilinear=True, tile=False, **properties):
         super(Frame, self).__init__(**properties)
 
         self.image = renpy.easy.displayable(image)
         self.tile = tile
+
+        # Compat for old argument names.
+        if left is None:
+            left = xborder
+        if top is None:
+            top= yborder
 
         if right is None:
             right = left
@@ -378,3 +384,42 @@ class Frame(renpy.display.core.Displayable):
 
     def visit(self):
         return [ self.image ]
+
+
+class FileCurrentScreenshot(renpy.display.core.Displayable):
+    """
+    :doc: file_action_function
+
+    A displayable that shows the screenshot that will be saved with the current
+    file, if a screenshot has been taken when entering a menu or with
+    :func:`FileTakeScreenshot`.
+
+    If there is no current screenshot, `empty` is shown in its place. (If `empty` is
+    None, it defaults to :func:`Null`.)
+    """
+
+    def __init__(self, empty=None, **properties):
+
+        super(FileCurrentScreenshot, self).__init__(**properties)
+
+        if empty is None:
+            empty = renpy.display.layout.Null()
+
+        self.empty = empty
+
+
+    def render(self, width, height, st, at):
+
+        ss = renpy.display.interface.screenshot_surface
+
+        if ss is None:
+            return renpy.display.render.render(self.empty, width, height, st, at)
+
+        tex = renpy.display.draw.load_texture(ss)
+        w, h = tex.get_size()
+
+        rv = renpy.display.render.Render(w, h)
+        rv.blit(tex, (0, 0))
+
+        return rv
+

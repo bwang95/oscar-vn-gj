@@ -1,4 +1,4 @@
-# Copyright 2004-2013 Tom Rothamel <pytom@bishoujo.us>
+# Copyright 2004-2014 Tom Rothamel <pytom@bishoujo.us>
 #
 # Permission is hereby granted, free of charge, to any person
 # obtaining a copy of this software and associated documentation files
@@ -885,6 +885,13 @@ class SWDraw(object):
         y /= self.scale_factor
 
         return x, y
+
+    def set_mouse_pos(self, x, y):
+
+        x *= self.scale_factor
+        y *= self.scale_factor
+
+        return pygame.mouse.set_pos([x, y])
 
 
     def screenshot(self, surftree, fullscreen_video):

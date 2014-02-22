@@ -1,4 +1,4 @@
-# Copyright 2004-2013 Tom Rothamel <pytom@bishoujo.us>
+# Copyright 2004-2014 Tom Rothamel <pytom@bishoujo.us>
 #
 # Permission is hereby granted, free of charge, to any person
 # obtaining a copy of this software and associated documentation files
@@ -362,7 +362,7 @@ class Channel(object):
                 while topq.filename in self.loop:
                     self.loop.remove(topq.filename)
 
-                if renpy.config.debug_sound:
+                if renpy.config.debug_sound and not renpy.game.after_rollback:
                     raise
                 else:
                     return

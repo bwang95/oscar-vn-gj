@@ -1,0 +1,18 @@
+﻿I'm sorry, but an uncaught exception occurred.
+
+While running game code:
+  File "game/script.rpy", line 220, in script
+Exception: Sayer 'start' is not defined.
+
+-- Full Traceback ------------------------------------------------------------
+
+Full traceback:
+  File "C:\Users\Brian\Documents\Programming\Libraries\renpy-6.16.5-sdk\renpy\execution.py", line 294, in run
+    node.execute()
+  File "C:\Users\Brian\Documents\Programming\Libraries\renpy-6.16.5-sdk\renpy\ast.py", line 440, in execute
+    raise Exception("Sayer '%s' is not defined." % self.who.encode("utf-8"))
+Exception: Sayer 'start' is not defined.
+
+Windows-post2008Server-6.2.9200
+Ren'Py 6.17.0.282
+Oscar 0.0
