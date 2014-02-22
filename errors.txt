@@ -2,20 +2,8 @@
 errors listed below, and try again.
 
 
-File "game/script.rpy", line 5: expected '=' not found.
-    image Oscar smile "Oscar-happyMouthClosed.gif"
-                                                  ^
-
-File "game/script.rpy", line 6: expected '=' not found.
-    image Oscar happy "Oscar-happyMouthOpen.gif"
-                                                ^
-
-File "game/script.rpy", line 7: expected '=' not found.
-    image Oscar sad"Oscar-sad.gif"
-                                  ^
-
-File "game/script.rpy", line 10: expected '=' not found.
-    image bg alley "Alley.jpg"
-                              ^
+File "game/script.rpy", line 53: expected statement.
+    moveinleft Flannery smile
+                             ^
 
 Ren'Py Version: Ren'Py 6.16.5.525
