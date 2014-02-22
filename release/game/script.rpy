@@ -51,6 +51,11 @@ define ro= Character('Rose',color="#FF66FF")
 define u = Character('???', color="#FFFFFF")
 define t= Character('Thorn', color="#FFFFFF")
 
+init python:
+    config.has_autosave = True
+    config.autosave_frequency = 10
+    config.developer = False
+    config.fade_music = 0.5
 
 # The game starts here.
 label start:
@@ -567,6 +572,8 @@ label BROTHER:
     b "Both you and Flannery stare as the large rock inevitably makes its way down;" 
     b "however, before it can reach you, you feel a sudden push from your right and watch as the rock smashes on top of both your friend and
        brother instead." 
+    stop music
+    play music "../sound/music/sadness.mp3"
     b "The instant was quick, and the damage from a distance seemed minimal." 
     b "Yet as you walked closer, the scent of blood filled the air and only a large pool of it was evidence of where Flannery once 
        stood." 
