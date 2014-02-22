@@ -69,7 +69,7 @@ label start:
        humans are movin’ in and they have a young’un with them too. You should
        go say hi."
     show Flannery smile with moveinleft
-    play music "../sound/music/Cat Meows.wav"
+    play music "../sound/music/Cat Meows.mp3"
     f "Hi ya there, neighbor! I’m Flannery. Nice to meet you!"
     menu:
         f "Hi ya there, neighbor! I’m Flannery. Nice to meet you!"
