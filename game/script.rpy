@@ -14,10 +14,12 @@ image Oscar worried="../art/char/Oscar-worried.gif"
 image Flannery smile="../art/char/Flannery-happy.gif"
 image Flannery sad="../art/char/Flannery-sad.gif"
 image Flannery mad="../art/char/Flannery-mad.gif"
+image Flannery evil="../art/char/Flannery-evil.gif"
 #Rosemary
 image Rosemary smile="../art/char/Rosemary-happy.gif"
 image Rosemary worried="../art/char/Rosemary-worried.gif"
 image Rose gang="../art/char/Rosemary-gang.gif"
+image Rose sad="../art/char/Rosemary-gangSad.gif"
 #Bernard
 image Bernard norm="../art/char/Bernard.gif"
 #Scar
@@ -120,9 +122,9 @@ label start:
                 f "Well then..."
                 f "LET'S GO!!!"
     hide Flannery smile with moveoutright
-    b "Looks like you and he are off to a good start. It’s 
-       always good to see you young’uns makin’ new friends.
-       Oh! And here comes your brother and his lovely playmate."
+    b "Looks like you and he are off to a good start." 
+    b "It’s always good to see you young’uns makin’ new friends."
+    b "Oh! And here comes your brother and his lovely playmate."
     
     # Alley Scene with Oscar
     scene bg alley with dissolve
@@ -183,11 +185,12 @@ label start:
             f "...well I'm gonna tell you anyway!"
         "Sure, let’s hear it.":
             $i=0
-    f "Well, it’s like this. I heard there was this 
-       great get-together going on in the alleyway just 
+    f "Well, it’s like this." 
+    f "I heard there was this great get-together going on in the alleyway just 
        beyond this park." 
     f "You should invite your brother and 
-       meet me there tonight at sundown. It’ll be totally fun."
+       meet me there tonight at sundown." 
+    f "It’ll be totally fun."
     menu:
         "That sounds like fun. We’ll definitely be there.":
             f " Awesome! I’ll see you there then. Don’t forget to invite Oscar!"
@@ -245,17 +248,20 @@ label start:
             "Save Oscar":
                 # TODO exit Rosemary
                 "Hey, flea-face! Get away from my brother!"
-                "(The leader ignores you, but another dog roughly grabs you by the scruff)"
+                b "The leader ignores you, but another dog roughly grabs you by the scruff"
                 with hpunch
                 "Let me go! Let me g-"
-                "(Wind rushes through your pelt as you’re hurled through the air. The sickening sound of bone being crushed is followed as your head collides with the alley wall. 
-                 The world becomes blurry and quickly begins to fade with each passing breath. An agonizing screech of pain is the last thing you hear as your eyes slowly begin to droop.)"
+                b "Wind rushes through your pelt as you’re hurled through the air." 
+                b "The sickening sound of bone being crushed is followed as your head collides with the alley wall." 
+                b "The world becomes blurry and quickly begins to fade with each passing breath." 
+                b "An agonizing screech of pain is the last thing you hear as your eyes slowly begin to droop."
                 with vpunch
                 "I'm sorry... Oscar..."
                 scene bg blackness with dissolve
                 jump badEnd
             "ACTIVATE SUPAH POWAH":
-                b "By the way, you are the descendant of mighty and powerful jungle cats, these mere hounds got nothing on yer awesome bloodline. You mess these dawgz up and jump on the scene leik a BAWSS."
+                b "By the way, you are the descendant of mighty and powerful jungle cats, these mere hounds got nothing on yer awesome bloodline." 
+                b "You mess these dawgz up and jump on the scene leik a BAWSS."
                 o "Brother! You've come to save me!"
                 "Yeah, dawg. I’m da BAWSS! now stand back as I prepare to destroy these peasants!"
                 with vpunch
@@ -277,8 +283,10 @@ label start:
     stop music
     scene bg appartment with dissolve
     play music "../sound/music/Cat Meows.mp3"
-    b "I haven’t seen anyone besides you for days. No offense, but it’s getting quite boring without everyone else. And you haven’t really been yourself either. 
-       Maybe you should get out and try to find your brother. Moping around here isn’t goin’ to solve nothin’."
+    b "I haven’t seen anyone besides you for days." 
+    b "No offense, but it’s getting quite boring without everyone else." 
+    b "And you haven’t really been yourself either." 
+    b "Maybe you should get out and try to find your brother. Moping around here isn’t goin’ to solve nothin’."
     scene bg park with dissolve
     # TODO enter scar
     show Scar mad with dissolve
@@ -291,9 +299,8 @@ label start:
     label mistakeDecision:
         menu:
             "You don’t know that. It could have been just a mistake.":
-                o "I can’t believe you’re taking his side! He’s been eyeing Rosemary since day one. You know what? Fine. 
-                   
-                   I’m done with you. I’m done with him. I done with the whole lot of you. I’ve found somewhere else where I belong."
+                o "I can’t believe you’re taking his side! He’s been eyeing Rosemary since day one. You know what? Fine." 
+                o "I’m done with you. I’m done with him. I done with the whole lot of you. I’ve found somewhere else where I belong."
                 hide Scar mad with moveoutleft
             "You’re right. I’m so sorry. You’re my brother. I should have been there for you.":
                 b "What a sap. Try again."
@@ -329,8 +336,10 @@ label start:
     show Flannery sad with dissolve
     f "Hey. I heard what happened that night. I’m really sorry about your brother."
     "Was it you?"
-    f "Of course not. Why would you even think that? Anyway, listen. I’ve heard some bad things about the group Oscar joined. They lure people in by saying they’ll 
-       provide a new life, but in reality, they are vicious and I fear for Oscar’s safety, especially since he’s dragged Rosemary into it as well."
+    f "Of course not. Why would you even think that? Anyway, listen." 
+    f "I’ve heard some bad things about the group Oscar joined." 
+    f "They lure people in by saying they’ll provide a new life, but in reality, they are vicious and I fear for Oscar’s safety," 
+    f "especially since he’s dragged Rosemary into it as well."
     "What can we do?"
     f "You need to try and stop him before he goes too far. Come on. Hurry!"
     hide Flannery sad with dissolve
@@ -406,24 +415,26 @@ label start:
         "Join him":
             "I will join your crew, brother."
             s "Good choice, brother, good choice."
-            b "Scar welcomes you into the gang, and all the members begin to respect you. However, as the days pass you begin to notice that no one has called you out on your lack of support. 
-               You have no skills in fighting or hunting, so you’re nothing more than just an extra mouth to feed. This seems fishy, and your suspicions are confirmed one evening when Rose approaches you."
-            r "Hello, little leech."
+            b "Scar welcomes you into the gang, and all the members begin to respect you." 
+            b "However, as the days pass you begin to notice that no one has called you out on your lack of support." 
+            b "You have no skills in fighting or hunting, so you’re nothing more than just an extra mouth to feed." 
+            b "This seems fishy, and your suspicions are confirmed one evening when Rose approaches you."
+            ro "Hello, little leech."
             "Little leech?"
-            r "Haven’t you noticed that no one has taught you the rules of the gang? And that we’ve just let you sit around?"
+            ro "Haven’t you noticed that no one has taught you the rules of the gang? And that we’ve just let you sit around?"
             "..."
-            r "It’s time for you to contribute. I have a task for you."
+            ro "It’s time for you to contribute. I have a task for you."
             "What?"
-            r "You must obtain… a SHRUBBERY!"
+            ro "You must obtain… a SHRUBBERY!"
             menu:
                 "Ni!":
                     b "And you had your eyes gouged out and your elbows broken, and had your kneecaps split and your body burned away, and your limbs all hacked and mangled… Oops. Wrong story."
                     jump badEnd
                 "What? I can't do that!":
-                    r "Alright, in that case… WHAT is the airspeed velocity of an unladen swallow?"
+                    ro "Alright, in that case… WHAT is the airspeed velocity of an unladen swallow?"
                     menu:
                         "African or European?":
-                            r "If you're going to be a smart-aleck, you won’t need to worry about anything but the velocity of my claws!"
+                            ro "If you're going to be a smart-aleck, you won’t need to worry about anything but the velocity of my claws!"
                             jump badEnd
                         "I don't know that!":
                             b "You were promptly kicked off a conveniently placed bridge into an equally conveniently placed chasm."
@@ -443,15 +454,15 @@ label start:
     b "But you’ve never been very good at that, have you?" 
     b "So instead of following my advice and being careful, you, of course, end up moving away from the safety of the den that Scar prepared for you." 
     b "There, you come across a scene that I would’ve run away from at my age."
-    show Rose gang at right with dissolve
+    show Rose sad at right with dissolve
     show Scar mad at left with dissolve
-    r "Scar, I know you want revenge but there’s no point. What’s done is done. Besides we’re better off here; we can start over
+    ro "Scar, I know you want revenge but there’s no point. What’s done is done. Besides we’re better off here; we can start over
        . We could even...start a family."
     s "Don’t be silly Rose, any kittens we would have would never be safe with that monster Flannery 
        on the loose!"
-    r " But how could he hurt us? We’re in a large and dark forest, inhabited by other cats that listen to your every command!"
+    ro " But how could he hurt us? We’re in a large and dark forest, inhabited by other cats that listen to your every command!"
     s "Rose, I refuse to lose you, much less bring kittens into that possibility."
-    r "Bu-"
+    ro "Bu-"
     s "Enough! My decision is final, Flannery needs to be out of the picture."
     hide Rose gang with dissolve
     hide Scar mad with dissolve
@@ -480,7 +491,7 @@ label start:
             f "I knew I could count on you!"
     stop music
     play music "../sound/music/Suspense 1.MP3"
-    show Scar mad with dissolve at right
+    show Scar mad at right with dissolve
     show Flannery mad at left
     s "Brother! I knew you would betray me again. There is no one I can 
        trust besides myself now, it seems."
@@ -494,10 +505,13 @@ label start:
     s "Ha! You can't because Rose is mine and mine alone. No matter what you do
        you can never have her."
     f "While that is quite unfortunate as I do have something even more important to you"
+    show Scar mad at right
     s "..."
     #TODO evil happy~ at left
+    show Flannery evil at left
     f "My 'best friend'...your brother"
     b "Ouch...it seems those words hit a nerve, because Oscar went straight for Flannery’s throat."
+    show Flannery mad at left
     b "However, it seems Flannery isn’t bad when it comes to dodging blows."
     b "But Flannery cannot keep it up for long, Oscar is definitely the stronger of the two." 
     b "So young’un who will you back up? Your dear brother or your best friend?"
