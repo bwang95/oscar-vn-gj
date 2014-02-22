@@ -9,13 +9,15 @@ image Oscar sad="../art/char/Oscar-sad.gif"
 image Oscar angry="../art/char/Oscar-mad.gif"
 image Oscar confused="../art/char/Oscar-confuse.gif"
 image Oscar frustrated="../art/char/Oscar-frustrated.gif"
+image Oscar worried="../art/char/Oscar-worried.gif"
 #Flannery
 image Flannery smile="../art/char/Flannery-happy.gif"
 image Flannery sad="../art/char/Flannery-sad.gif"
 #Rosemary
 image Rosemary smile="../art/char/Rosemary-happy.gif"
 image Rosemary worried="../art/char/Rosemary-worried.gif"
-
+#Bernard
+image Bernard norm="../art/char/Bernard.gif"
 #backgrounds
 image bg blackness="../art/bg/Blackness.jpg."
 image bg alley="../art/bg/Alley.jpg"
