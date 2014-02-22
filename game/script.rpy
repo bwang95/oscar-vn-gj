@@ -2,12 +2,12 @@
 
 # Declare images below this line, using the image statement.
 # eg. image eileen happy = "eileen_happy.png"
-image Oscar smile="Oscar-happyMouthClosed.gif"
-image Oscar happy="Oscar-happyMouthOpen.gif"
-image Oscar sad="Oscar-sad.gif"
+image Oscar smile="../art/char/Oscar-happyMouthClosed.gif"
+image Oscar happy="../art/char/Oscar-happyMouthOpen.gif"
+image Oscar sad="../art/char/Oscar-sad.gif"
 
 #backgrounds
-image bg alley="Alley.jpg"
+image bg alley="../art/bg/Alley.jpg"
 # Declare characters used by this game.
 define o = Character('Oscar', color="#3300CC")
 define f = Character('Flannery', color="#FF0000")
