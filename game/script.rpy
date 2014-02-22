@@ -51,6 +51,10 @@ define ro= Character('Rose',color="#FF66FF")
 define u = Character('???', color="#FFFFFF")
 define t= Character('Thorn', color="#FFFFFF")
 
+init python:
+    config.has_autosave = True
+    config.autosave_frequency = 10
+    config.fade_music = 0.5
 
 # The game starts here.
 label start:
