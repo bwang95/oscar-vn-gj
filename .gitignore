@@ -4,3 +4,4 @@ game/*.rpyb
 game/*.rpyc
 game/saves/
 game/assets/
+log.txt

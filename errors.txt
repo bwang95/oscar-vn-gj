@@ -2,8 +2,8 @@
 errors listed below, and try again.
 
 
-File "game/script.rpy", line 53: expected statement.
-    moveinleft Flannery smile
-                             ^
+File "game/script.rpy", line 64: play requires a channel
+    play "../sound/music/catmeows.wav"
+         ^
 
 Ren'Py Version: Ren'Py 6.16.5.525
