@@ -2,8 +2,8 @@
 errors listed below, and try again.
 
 
-File "game/script.rpy", line 53: expected statement.
-    moveinleft Flannery smile
-                             ^
+File "game/script.rpy", line 129: Line is followed by a block, despite not being a menu choice. Did you forget a colon at the end of the line?
+    "Whaaaa?"
+             ^
 
 Ren'Py Version: Ren'Py 6.16.5.525

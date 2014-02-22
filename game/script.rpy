@@ -17,12 +17,15 @@ image Rosemary smile="../art/char/Rosemary-happy.gif"
 image Rosemary worried="../art/char/Rosemary-worried.gif"
 
 #backgrounds
+image bg blackness="../art/bg/blackness.jpg./"
 image bg alley="../art/bg/Alley.jpg"
 image bg kitties="../art/bg/Kittens.jpg"
 image bg run="../art/bg/running kitties.jpg."
 image bg together="../art/bg/syblings.jpg."
 image bg rose="../art/bg/rosemary.jpg."
 image bg truck="../art/bg/moving truck.jpg."
+image bg park= "../art/bg/park.jpg."
+image bg appartment= "../art/bg/appartment.jpg."
 # Declare characters used by this game.
 define o = Character('Oscar', color="#3300CC")
 define f = Character('Flannery', color="#FF0000")
@@ -51,7 +54,7 @@ label start:
        Rosemary didn’ change nothin’. "
     scene bg rose with fade
     b "She was the prettiest thing I ever saw, but she only had eyes for Oscar 
-       and he sure had eyes for her back. He loved her and she darn loved him 
+       and he sure had eyes for her as well. He loved her and she darn loved him 
        back, and you, were the happy third leg all the way."
     scene bg truck with fade
     b "Well lookie here, young’un. I think you might have a new playmate. More 
@@ -99,10 +102,87 @@ label start:
     menu:
        f "Who is that gorgeous she-cat?" 
        "My brother’s mate.":
-           f "Flannery: Oh! Would you introduce me?"
+           f "Oh! Would you introduce me?"
        "None of your business.": 
-           f "Flannery: Oh! Would you introduce me?"
+           f "Oh! Would you introduce me?"
        "Her name is Rosemary.":
-           f "Flannery: Oh! Would you introduce me?"
- 
+           f "Oh! Would you introduce me?"
+    show Flannery smile at left with dissolve
+    show Rosemary worried at center with dissolve
+    show Oscar frustrated at right with dissolve
+    f "Hi there. I’m Flannery! Who might you be?"
+    show Oscar angry at right
+    o "Rosemary, get back. He might be dangerous."
+    "Wait! He's my friend!"
+    show Oscar confused at right
+    o ".......oh..."
+    show Oscar happy at right
+    o "Okay then, I’m Oscar and this is Rosemary."
+    r "Hi..."
+    o "Come on Rosemary, I want to show you something."
+    hide Oscar happy with moveoutright
+    hide Rosemary worried with moveoutright
+    hide Flannery smile
+    show Flannery smile at center
+    f "Oh, Rosemary! Where have you been all my life? Deny your false lover, 
+       you are not Oscar’s. Who is Oscar anyway? No paw nor tail nor any other 
+       part belongs to a tom. What is in a protector? That which we call a master
+       by any other name would claim as much. So Rosemary, would you not be that 
+       Oscar’s! And from that tom cat, I must take you for my own."
+    menu:
+        "Whaaaa?":
+            f "I kid; I kid."
+        "William Shakespeare much?":
+            f "Impressive!"
+    scene bg park with dissolve
+    b " With Flannery at your side, you were no longer the third leg. 
+       In fact, now you had all four legs! Ha. You and your friends were 
+       my favorite part of the day. Days passed and as I was lazing in the sun, 
+       I spotted you and your newest friend wandering by."
+    show Flannery smile at right
+    f "Hey! Guess what? I had this great idea. Wanna hear it?"
+    menu: 
+        "What would I do that for?":
+            f "...well I'm gonna tell you anyway!"
+        "Sure, let’s hear it.":
+            $i=0
+    f "Well, it’s like this. I heard there was this 
+       great get-together going on in the alleyway just 
+       beyond this park. You should invite your brother and 
+       meet me there tonight at sundown. It’ll be totally fun."
+    menu:
+        "That sounds like fun. We’ll definitely be there.":
+            f " Awesome! I’ll see you there then. Don’t forget to invite Oscar!"
+        "Like hell I’ll go there. Go by yourself.":
+            show Flannery sad
+            f "Why are you bent on ruining my plans? I just wanted to invite you to 
+            something nice and fun! You could just give me a chance! 
+            Fine. If you are so desperate to not be friends, then I’ll just leave. 
+            Have a nice life!"
+            scene blackness with dissolve
+            b "Well, where did you go wrong? you lost a friend, but you were able to 
+               get over that and live a really happy life with Oscar and Rosemary. ...Or do you?"
+            jump badEnd
+    hide Flannery with moveoutleft
+    show Oscar smile with moveinright
+    o "Hey. What’s up?"
+    "Flannery invited us to a party tonight"
+    show Oscar confused 
+    o " Are you sure that’s a good idea?"
+    menu: 
+        " Not really, but who knows?":
+            show Oscar smile
+            o "Hm. Well, I guess we can go. Just be on your guard."
+        "Yeah, sure. Why not?":
+            show Oscar smile
+            o "Hm. Well, I guess we can go. Just be on your guard."
+    hide Oscar with moveoutright
+    b "So at sundown, I watched you and your brother leave your human’s 
+       den and hurry along towards the alleyway past the park down by the 
+       river in hopes to meet Flannery and have a nice time."
+    scene bg alley with dissolve
+    
     return
+    
+    label badEnd:
+        "-= BAD END =-"
