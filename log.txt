@@ -1,6 +1,6 @@
-Sat Feb 22 01:22:47 2014
+Sat Feb 22 02:29:15 2014
 Windows-post2008Server-6.2.9200
-Ren'Py 6.16.5.525
+Ren'Py 6.17.0.282
 Oscar 0.0
 
 
@@ -200,12 +200,8 @@ Texture testing:
 Performance test:
 - Target is 5 frames in 0.333333333333 seconds.
 - Frame drawn at 0.000000 seconds.
-- Frame drawn at 0.019000 seconds.
-- Frame drawn at 0.028000 seconds.
-- Frame drawn at 0.030000 seconds.
-- Frame drawn at 0.031000 seconds.
-- 0.031000 seconds to render 5 frames.
-Deallocating textures.
-Done deallocating textures.
-About to quit GL.
-Finished quit GL.
+- Frame drawn at 0.006000 seconds.
+- Frame drawn at 0.010000 seconds.
+- Frame drawn at 0.011000 seconds.
+- Frame drawn at 0.012000 seconds.
+- 0.012000 seconds to render 5 frames.

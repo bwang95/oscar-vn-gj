@@ -1,0 +1,1 @@
+{"layout": null, "package": "com.oscar.android", "include_pil": false, "numeric_version": "103", "expansion": false, "name": "Oscar", "source": false, "icon_name": "Oscar", "version": "1.03", "target_version": 14, "permissions": ["VIBRATE"], "include_sqlite": false, "orientation": "landscape"}
