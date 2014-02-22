@@ -42,32 +42,32 @@ init -1 python hide:
 
     theme.diamond(
         ## Theme: Diamond
-        ## Color scheme: City Lights
+        ## Color scheme: Basic Blue
 
         ## The color of an idle widget face.
-        widget = "#45ada8",
+        widget = "#003c78",
 
         ## The color of a focused widget face.
-        widget_hover = "#2e5860",
+        widget_hover = "#0050a0",
 
         ## The color of the text in a widget.
-        widget_text = "#9de0ad",
+        widget_text = "#c8ffff",
 
         ## The color of the text in a selected widget. (For
         ## example, the current value of a preference.)
-        widget_selected = "#e5fcc2",
+        widget_selected = "#ffffc8",
 
         ## The color of a disabled widget face.
-        disabled = "#638e89",
+        disabled = "#404040",
 
         ## The color of disabled widget text.
-        disabled_text = "#594f4f",
+        disabled_text = "#c8c8c8",
 
         ## The color of informational labels.
-        label = "#e5fcc2",
+        label = "#ffffff",
 
         ## The color of a frame containing widgets.
-        frame = "#547980",
+        frame = "#6496c8",
 
         ## The background of the main menu. This can be a color
         ## beginning with '#', or an image filename. The latter
@@ -77,7 +77,7 @@ init -1 python hide:
         ## The background of the game menu. This can be a color
         ## beginning with '#', or an image filename. The latter
         ## should take up the full height and width of the screen.
-        gm_root = "../art/oscar logo.png",
+        gm_root = "#dcebff",
 
         ## If this is True, the in-game window is rounded. If False,
         ## the in-game window is square.

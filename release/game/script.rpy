@@ -236,6 +236,7 @@ label start:
     o "Something’s wrong. We should turn back."
     "No, Flannery should be here somewhere."
     stop music
+    play sound "../sound/effect/growl.mp3"
     play music "../sound/music/Suspense 1.mp3"
     with hpunch
     scene bg dog 

@@ -1,41 +1,28 @@
 ﻿I'm sorry, but an uncaught exception occurred.
 
-While running game code:
-  File "game/script.rpy", line 367, in script
-IOError: Couldn't find file '../sound/music/ Villain 1.MP3'.
+After initialization, but before game start.
+Exception: Color string must be 3, 4, 6, or 8 hex digits long.
 
 -- Full Traceback ------------------------------------------------------------
 
 Full traceback:
-  File "C:\Users\Rachael\Documents\CS\Games\Renpy Games\renpy-6.16.5-sdk\renpy\execution.py", line 288, in run
-    node.execute()
-  File "C:\Users\Rachael\Documents\CS\Games\Renpy Games\renpy-6.16.5-sdk\renpy\ast.py", line 455, in execute
-    renpy.exports.say(who, what, interact=self.interact)
-  File "C:\Users\Rachael\Documents\CS\Games\Renpy Games\renpy-6.16.5-sdk\renpy\exports.py", line 853, in say
-    who(what, interact=interact)
-  File "C:\Users\Rachael\Documents\CS\Games\Renpy Games\renpy-6.16.5-sdk\renpy\character.py", line 807, in __call__
-    self.do_display(who, what, cb_args=self.cb_args, **display_args)
-  File "C:\Users\Rachael\Documents\CS\Games\Renpy Games\renpy-6.16.5-sdk\renpy\character.py", line 673, in do_display
-    **display_args)
-  File "C:\Users\Rachael\Documents\CS\Games\Renpy Games\renpy-6.16.5-sdk\renpy\character.py", line 476, in display_say
-    rv = renpy.ui.interact(mouse='say', type=type, roll_forward=roll_forward)
-  File "C:\Users\Rachael\Documents\CS\Games\Renpy Games\renpy-6.16.5-sdk\renpy\ui.py", line 237, in interact
-    rv = renpy.game.interface.interact(roll_forward=roll_forward, **kwargs)
-  File "C:\Users\Rachael\Documents\CS\Games\Renpy Games\renpy-6.16.5-sdk\renpy\display\core.py", line 1853, in interact
-    repeat, rv = self.interact_core(preloads=preloads, **kwargs)
-  File "C:\Users\Rachael\Documents\CS\Games\Renpy Games\renpy-6.16.5-sdk\renpy\display\core.py", line 2126, in interact_core
-    renpy.audio.audio.interact()
-  File "C:\Users\Rachael\Documents\CS\Games\Renpy Games\renpy-6.16.5-sdk\renpy\audio\audio.py", line 913, in interact
-    periodic()
-  File "C:\Users\Rachael\Documents\CS\Games\Renpy Games\renpy-6.16.5-sdk\renpy\audio\audio.py", line 847, in periodic
-    c.periodic()
-  File "C:\Users\Rachael\Documents\CS\Games\Renpy Games\renpy-6.16.5-sdk\renpy\audio\audio.py", line 349, in periodic
-    topf = load(self.file_prefix + topq.filename + self.file_suffix)
-  File "C:\Users\Rachael\Documents\CS\Games\Renpy Games\renpy-6.16.5-sdk\renpy\audio\audio.py", line 83, in load
-    rv = renpy.loader.load(fn)
-  File "C:\Users\Rachael\Documents\CS\Games\Renpy Games\renpy-6.16.5-sdk\renpy\loader.py", line 428, in load
-    raise IOError("Couldn't find file '%s'." % name)
-IOError: Couldn't find file '../sound/music/ Villain 1.MP3'.
+  File "C:\Users\Rachael\Documents\CS\Games\Renpy Games\renpy-6.16.5-sdk\renpy\bootstrap.py", line 265, in bootstrap
+    renpy.main.main()
+  File "C:\Users\Rachael\Documents\CS\Games\Renpy Games\renpy-6.16.5-sdk\renpy\main.py", line 281, in main
+    renpy.style.build_styles()
+  File "C:\Users\Rachael\Documents\CS\Games\Renpy Games\renpy-6.16.5-sdk\renpy\style.py", line 675, in build_styles
+    build_style(s)
+  File "C:\Users\Rachael\Documents\CS\Games\Renpy Games\renpy-6.16.5-sdk\renpy\style.py", line 646, in build_style
+    my_updates.extend(expand_properties(p))
+  File "C:\Users\Rachael\Documents\CS\Games\Renpy Games\renpy-6.16.5-sdk\renpy\style.py", line 531, in expand_properties
+    newval = func(val)
+  File "C:\Users\Rachael\Documents\CS\Games\Renpy Games\renpy-6.16.5-sdk\renpy\easy.py", line 81, in displayable_or_none
+    return renpy.store.Solid(d)
+  File "C:\Users\Rachael\Documents\CS\Games\Renpy Games\renpy-6.16.5-sdk\renpy\display\imagelike.py", line 45, in __init__
+    self.color = renpy.easy.color(color)
+  File "C:\Users\Rachael\Documents\CS\Games\Renpy Games\renpy-6.16.5-sdk\renpy\easy.py", line 65, in color
+    raise Exception("Color string must be 3, 4, 6, or 8 hex digits long.")
+Exception: Color string must be 3, 4, 6, or 8 hex digits long.
 
 Windows-post2008Server-6.2.9200
 Ren'Py 6.16.5.525
