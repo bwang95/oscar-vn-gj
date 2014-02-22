@@ -2,8 +2,8 @@
 errors listed below, and try again.
 
 
-File "game/script.rpy", line 64: play requires a channel
-    play "../sound/music/catmeows.wav"
-         ^
+File "game/script.rpy", line 323: choice menuitem expects a non-empty block.
+    "Follow Rosemary":
+                      ^
 
-Ren'Py Version: Ren'Py 6.16.5.525
+Ren'Py Version: Ren'Py 6.17.0.282

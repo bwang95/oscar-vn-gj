@@ -1,4 +1,4 @@
-# Copyright 2004-2013 Tom Rothamel <pytom@bishoujo.us>
+# Copyright 2004-2014 Tom Rothamel <pytom@bishoujo.us>
 #
 # Permission is hereby granted, free of charge, to any person
 # obtaining a copy of this software and associated documentation files
@@ -26,7 +26,6 @@
 # the end of the init phase, before the game begins running, and can
 # decide if the game runs or some other action occurs.
 
-import os
 import argparse
 import renpy
 

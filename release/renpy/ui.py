@@ -1,4 +1,4 @@
-# Copyright 2004-2013 Tom Rothamel <pytom@bishoujo.us>
+# Copyright 2004-2014 Tom Rothamel <pytom@bishoujo.us>
 #
 # Permission is hereby granted, free of charge, to any person
 # obtaining a copy of this software and associated documentation files
@@ -343,17 +343,11 @@ def style_group_style(s, style_group):
         style_group = stack[-1].style_group
 
     if style_group is None:
-        return s
+        new_style = s
+    else:
+        new_style = style_group + "_" + s
 
-    new_style = style_group + "_" + s
-
-    if new_style[0] == "_":
-        return new_style
-
-    if new_style not in renpy.style.style_map:
-        renpy.style.style_map[new_style] = renpy.style.Style(s, heavy=False, name=new_style)
-
-    return new_style
+    return renpy.style.get_style(new_style) # @UndefinedVariable
 
 # The screen we're using as we add widgets. None if there isn't a
 # screen.
@@ -830,7 +824,7 @@ def _imagebutton(idle_image = None,
                  auto=None,
                  **properties):
 
-    def choice(a, b, name):
+    def choice(a, b, name, required=False):
         if a:
             return a
 
@@ -840,9 +834,12 @@ def _imagebutton(idle_image = None,
         if auto is not None:
             return renpy.config.imagemap_auto_function(auto, name)
 
+        if required:
+            raise Exception("Could not find a %s image for imagemap." % name)
+
         return None
 
-    idle = choice(idle, idle_image, "idle")
+    idle = choice(idle, idle_image, "idle", required=True)
     hover = choice(hover, hover_image, "hover")
     insensitive = choice(insensitive, insensitive_image, "insensitive")
     selected_idle = choice(selected_idle, selected_idle_image, "selected_idle")
@@ -862,25 +859,6 @@ def _imagebutton(idle_image = None,
 
 imagebutton = Wrapper(_imagebutton, style="image_button")
 
-def get_text_style(style, default):
-    if isinstance(style, basestring):
-        base = style
-        rest = ()
-    else:
-        base = style.name[0]
-        rest = style.name[1:]
-
-    base = base + "_text"
-
-    rv = renpy.style.style_map.get(base, None)
-
-    if rv is None:
-        rv = renpy.style.style_map[default]
-
-    for i in rest:
-        rv = rv[i]
-
-    return rv
 
 def textbutton(label, clicked=None, style=None, text_style=None, substitute=True, scope=None, **kwargs):
 
@@ -904,7 +882,7 @@ def textbutton(label, clicked=None, style=None, text_style=None, substitute=True
         style = style_group_style('button', NoStyleGroupGiven)
 
     if text_style is None:
-        text_style = get_text_style(style, style_group_style('button_text', NoStyleGroupGiven))
+        text_style = renpy.style.get_text_style(style, style_group_style('button_text', NoStyleGroupGiven)) # @UndefinedVariable
 
     button(style=style, clicked=clicked, **button_kwargs)
     text(label, style=text_style, substitute=substitute, scope=scope, **text_kwargs)
@@ -924,7 +902,7 @@ def label(label, style=None, text_style=None, substitute=True, scope=None, **kwa
         style = style_group_style('label', NoStyleGroupGiven)
 
     if text_style is None:
-        text_style = get_text_style(style, style_group_style('label_text', NoStyleGroupGiven))
+        text_style = renpy.style.get_text_style(style, style_group_style('label_text', NoStyleGroupGiven)) # @UndefinedVariable
 
     window(style=style, **label_kwargs)
     text(label, style=text_style, substitute=substitute, scope=scope, **text_kwargs)

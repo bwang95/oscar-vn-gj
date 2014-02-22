@@ -1,4 +1,4 @@
-# Copyright 2004-2013 Tom Rothamel <pytom@bishoujo.us>
+# Copyright 2004-2014 Tom Rothamel <pytom@bishoujo.us>
 #
 # Permission is hereby granted, free of charge, to any person
 # obtaining a copy of this software and associated documentation files
@@ -91,6 +91,18 @@ class Keyword(object):
         if parser:
             parser.add(self)
 
+STYLE_PREFIXES = [
+    '',
+    'insensitive_',
+    'hover_',
+    'idle_',
+    'activate_',
+    'selected_',
+    'selected_insensitive_'
+    'selected_hover_',
+    'selected_idle_',
+    'selected_activate_',
+]
 
 class Style(object):
     """
@@ -100,7 +112,7 @@ class Style(object):
     def __init__(self, name):
         self.name = name
 
-        for j in renpy.style.prefix_subs:
+        for j in STYLE_PREFIXES:
             all_keyword_names.add(j + self.name)
 
         if parser:
@@ -116,7 +128,7 @@ class PrefixStyle(object):
         self.prefix = prefix
         self.name = name
 
-        for j in renpy.style.prefix_subs:
+        for j in STYLE_PREFIXES:
             all_keyword_names.add(prefix + j + self.name)
 
         if parser:
@@ -159,11 +171,11 @@ class Parser(object):
             self.keyword[i.name] = i
 
         elif isinstance(i, Style):
-            for j in renpy.style.prefix_subs:
+            for j in STYLE_PREFIXES:
                 self.keyword[j + i.name] = i
 
         elif isinstance(i, PrefixStyle):
-            for j in renpy.style.prefix_subs:
+            for j in STYLE_PREFIXES:
                 self.keyword[i.prefix + j + i.name] = i
 
         elif isinstance(i, Parser):
@@ -494,6 +506,9 @@ position_property_names = [
         # no center, since it can conflict with the center transform.
         "xcenter",
         "ycenter",
+        "xsize",
+        "ysize",
+        "xysize",
         ]
 
 position_properties = [ Style(i) for i in position_property_names ]
@@ -691,6 +706,7 @@ Keyword("exclude")
 Keyword("prefix")
 Keyword("suffix")
 Keyword("changed")
+Keyword("pixel_width")
 add(ui_properties)
 add(position_properties)
 add(text_properties)
@@ -705,6 +721,7 @@ Keyword("action")
 Keyword("clicked")
 Keyword("hovered")
 Keyword("unhovered")
+Keyword("alternate")
 add(ui_properties)
 add(position_properties)
 add(window_properties)
@@ -722,6 +739,7 @@ Keyword("action")
 Keyword("clicked")
 Keyword("hovered")
 Keyword("unhovered")
+Keyword("alternate")
 Keyword("image_style")
 add(ui_properties)
 add(position_properties)
@@ -734,6 +752,7 @@ Keyword("action")
 Keyword("clicked")
 Keyword("hovered")
 Keyword("unhovered")
+Keyword("alternate")
 Keyword("text_style")
 Keyword("substitute")
 Keyword("scope")

@@ -1,4 +1,4 @@
-# Copyright 2004-2013 Tom Rothamel <pytom@bishoujo.us>
+# Copyright 2004-2014 Tom Rothamel <pytom@bishoujo.us>
 #
 # Permission is hereby granted, free of charge, to any person
 # obtaining a copy of this software and associated documentation files
@@ -39,7 +39,7 @@ try:
 
         apks = [
             android.apk.APK(apk=expansion, prefix='assets/x-game/'),
-            android.apk.APK(apk=expansion, prefix='assets/x-common/'),
+            android.apk.APK(apk=expansion, prefix='assets/x-renpy/x-common/'),
             ]
 
         game_apks = [ apks[0] ]
@@ -49,7 +49,7 @@ try:
 
         apks = [
             android.apk.APK(prefix='assets/x-game/'),
-            android.apk.APK(prefix='assets/x-common/'),
+            android.apk.APK(prefix='assets/x-renpy/x-common/'),
             ]
 
         game_apks = [ apks[0] ]

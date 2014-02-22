@@ -1,4 +1,4 @@
-# Copyright 2004-2013 Tom Rothamel <pytom@bishoujo.us>
+# Copyright 2004-2014 Tom Rothamel <pytom@bishoujo.us>
 #
 # Permission is hereby granted, free of charge, to any person
 # obtaining a copy of this software and associated documentation files
@@ -188,6 +188,17 @@ def fix_rollback():
     """
     renpy.game.log.fix_rollback()
 
+def retain_after_load():
+    """
+    :doc: retain_after_load
+
+    Causes data modified between the current statement and the statement
+    containing the next checkpoint to be retained when a load occurs.
+    """
+
+    renpy.game.log.retain_after_load()
+
+
 scene_lists = renpy.display.core.scene_lists
 
 def count_displayables_in_layer(layer):
@@ -283,6 +294,63 @@ def showing(name, layer='master'):
         name = tuple(name.split())
 
     return renpy.game.context().images.showing(layer, name)
+
+def predict_show(name, layer='master', what=None, tag=None, at_list=[ ]):
+    """
+    :undocumented:
+
+    Predicts a scene or show statement.
+
+    `name`
+        The name of the image to show, a string.
+
+    `layer`
+        The layer the image is being show non.
+
+    `what`
+        What is being show - if given, overrides `name`.
+
+    `tag`
+        The tag of the thing being shown.
+
+    `at_list`
+        A list of transforms to apply to the displayable.
+    """
+
+    key = tag or name[0]
+
+    if what is None:
+        what = name
+    elif isinstance(what, basestring):
+        what = tuple(what.split())
+
+    if isinstance(what, renpy.display.core.Displayable):
+        base = img = what
+
+    else:
+        if renpy.config.image_attributes:
+
+            new_what = renpy.game.context().images.apply_attributes(layer, key, name)
+            if new_what is not None:
+                what = new_what
+                name = (key,) + new_what[1:]
+
+        base = img = renpy.display.image.ImageReference(what, style='image_placement')
+
+        if not base.find_target():
+            return
+
+    for i in at_list:
+        if isinstance(i, renpy.display.motion.Transform):
+            img = i(child=img)
+        else:
+            img = i(img)
+
+    renpy.game.context().images.predict_show(layer, name, True)
+    renpy.display.predict.displayable(img)
+
+
+
 
 def show(name, at_list=[ ], layer='master', what=None, zorder=0, tag=None, behind=[ ], atl=None, transient=False, munge_name=True):
     """
@@ -448,7 +516,7 @@ def watch(expression, style='default', **properties):
 
     renpy.config.overlay_functions.append(overlay_func)
 
-def input(prompt, default='', allow=None, exclude='{}', length=None, with_none=None): #@ReservedAssignment
+def input(prompt, default='', allow=None, exclude='{}', length=None, with_none=None, pixel_width=None): #@ReservedAssignment
     """
     :doc: input
 
@@ -472,6 +540,10 @@ def input(prompt, default='', allow=None, exclude='{}', length=None, with_none=N
     `length`
         If not None, this must be an integer giving the maximum length
         of the input string.
+
+    `pixel_width`
+        If not None, the input is limited to being this many pixels wide,
+        in the font used by the
     """
 
     renpy.exports.mode('input')
@@ -488,7 +560,7 @@ def input(prompt, default='', allow=None, exclude='{}', length=None, with_none=N
 
     if has_screen("input"):
         widget_properties = { }
-        widget_properties["input"] = dict(default=default, length=length, allow=allow, exclude=exclude, editable=not fixed)
+        widget_properties["input"] = dict(default=default, length=length, allow=allow, exclude=exclude, editable=not fixed, pixel_width=pixel_width)
 
         show_screen("input", _transient=True, _widget_properties=widget_properties, prompt=prompt)
 
@@ -1133,10 +1205,8 @@ def toggle_fullscreen():
 def toggle_music():
     """
     :undocumented:
-    Toggles the playing of music.
+    Does nothing.
     """
-
-    renpy.game.preferences.music = not renpy.game.preferences.music
 
 def has_label(name):
     """
@@ -1203,7 +1273,7 @@ def utter_restart():
 
     raise renpy.game.UtterRestartException()
 
-def quit(relaunch=False): #@ReservedAssignment
+def quit(relaunch=False, status=0): #@ReservedAssignment
     """
     :doc: other
 
@@ -1211,9 +1281,13 @@ def quit(relaunch=False): #@ReservedAssignment
 
     `relaunch`
         If true, Ren'Py will run a second copy of itself before quitting.
+
+    `status`
+        The status code Ren'Py will return to the operating system.
+        Generally, 0 is success, and positive integers are failure.
     """
 
-    raise renpy.game.QuitException(relaunch)
+    raise renpy.game.QuitException(relaunch=relaunch, status=status)
 
 def jump(label):
     """
@@ -1270,15 +1344,6 @@ def version(tuple=False): #@ReservedAssignment
         return renpy.version_tuple
 
     return renpy.version
-
-def module_version():
-    """
-    :undocumented:
-    Returns a number corresponding to the current version of the Ren'Py module,
-    or 0 if the module wasn't loaded.
-    """
-
-    return renpy.display.module.version
 
 def transition(trans, layer=None, always=False, force=False):
     """
@@ -1844,6 +1909,30 @@ def get_placement(d):
 
     return placement(p)
 
+def get_image_bounds(tag, width=None, height=None, layer='master'):
+    """
+    :doc: image_func
+
+    If an image with `tag` exists on `layer`, returns the bounding box of
+    that image. Returns None if the image is not found.
+
+    The bounding box is an (x, y, width, height) tuple. The components of
+    the tuples are expressed in pixels, and may be floating point numbers.
+
+    `width`, `height`
+        The width and height of the area that contains the image. If None,
+        defaults the width and height of the screen, respectively.
+    """
+
+    tag = tag.split()[0]
+
+    if width is None:
+        width = renpy.config.screen_width
+    if height is None:
+        height = renpy.config.screen_height
+
+    return scene_lists().get_image_bounds(layer, tag, width, height)
+
 # User-Defined Displayable stuff.
 
 Render = renpy.display.render.Render
@@ -2050,9 +2139,20 @@ def variant(name):
     by Ren'Py. See :ref:`screen-variants` for more details. This function
     can be used as the condition in a python if statement to set up the
     appropriate styles for the selected screen variant.
+
+    `name` can also be a list of variants, in which case this function
+    returns True if any of the variants is selected.
     """
 
-    return name in renpy.config.variants
+    if isinstance(name, basestring):
+        return name in renpy.config.variants
+    else:
+        for n in name:
+            if n in renpy.config.variants:
+                return True
+
+        return False
+
 
 def vibrate(duration):
     """
@@ -2069,9 +2169,6 @@ def vibrate(duration):
         pass
 
 
-# The attributes that are applied to the current say statement.
-say_attributes = None
-
 def get_say_attributes():
     """
     :doc: other
@@ -2082,7 +2179,8 @@ def get_say_attributes():
     This is only valid when executing or predicting a say statement.
     """
 
-    return say_attributes
+    return renpy.game.context().say_attributes
+
 
 def get_side_image(prefix_tag, image_tag=None, not_showing=True, layer='master'):
     """
@@ -2248,3 +2346,19 @@ def get_mouse_pos():
     currently being touched, x and y are numbers, but not meaningful.
     """
     return renpy.display.draw.get_mouse_pos()
+
+def set_mouse_pos(x, y, duration=0):
+    """
+    :doc: other
+
+    Jump the mouse pointer to the location given by arguments x and y.
+    If the device does not have a mouse pointer, this does nothing.
+
+    `duration`
+        The time it will take to perform the move, in seconds.
+        During this time, the mouse may be unresponsive.
+    """
+
+    renpy.display.interface.set_mouse_pos(x, y, duration)
+
+

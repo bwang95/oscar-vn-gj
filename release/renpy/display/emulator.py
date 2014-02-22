@@ -1,4 +1,4 @@
-# Copyright 2004-2013 Tom Rothamel <pytom@bishoujo.us>
+# Copyright 2004-2014 Tom Rothamel <pytom@bishoujo.us>
 #
 # Permission is hereby granted, free of charge, to any person
 # obtaining a copy of this software and associated documentation files
@@ -26,7 +26,8 @@ import renpy.display
 import os
 import pygame
 
-# The function that's called to perform the emulation.
+# The function that's called to perform the emulation. This function has
+# the signature of null_emulator.
 emulator = None
 
 # An overlay that is placed over the screen to support the emulator.

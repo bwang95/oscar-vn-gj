@@ -1,5 +1,23 @@
-# Copyright 2004-2013 Tom Rothamel <pytom@bishoujo.us>
-# See LICENSE.txt for license details.
+﻿# Copyright 2004-2014 Tom Rothamel <pytom@bishoujo.us>
+#
+# Permission is hereby granted, free of charge, to any person
+# obtaining a copy of this software and associated documentation files
+# (the "Software"), to deal in the Software without restriction,
+# including without limitation the rights to use, copy, modify, merge,
+# publish, distribute, sublicense, and/or sell copies of the Software,
+# and to permit persons to whom the Software is furnished to do so,
+# subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be
+# included in all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+# EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+# MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+# NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+# LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+# OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+# WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 init -1500 python:
 
@@ -43,11 +61,16 @@ init -1500 python:
          * Preference("display", "fullscreen") - displays in fullscreen mode.
          * Preference("display", "window") - displays in windowed mode at 1x normal size.
          * Preference("display", 2.0) - displays in windowed mode at 2.0x normal size.
+         * Preference("display", "any window") - displays in windowed mode at the previous size.
          * Preference("display", "toggle") - toggle display mode.
 
          * Preference("transitions", "all") - show all transitions.
          * Preference("transitions", "none") - do not show transitions.
          * Preference("transitions", "toggle") - toggle transitions.
+
+         * Preference("show empty window", "show") - Allow the "window show" and "window auto" statement to show an empty window outside of the say statement.
+         * Preference("show empty window", "hide") - Prevent the above.
+         * Preference("show empty window", "toggle") - Toggle the above.
 
          * Preference("text speed", 0) - make text appear instantaneously.
          * Preference("text speed", 142) - set text speed to 142 characters per second.
@@ -71,6 +94,14 @@ init -1500 python:
          * Preference("auto-forward", "disable") - Disable auto-forward mode.
          * Preference("auto-forward", "toggle") - Toggle auto-forward mode.
 
+         * Preference("auto-forward after click", "enable") - Remain in auto-forward mode after a click.
+         * Preference("auto-forward after click", "disable") - Disable auto-forward mode after a click.
+         * Preference("auto-forward after click", "toggle") - Toggle auto-forward after click.
+
+         * Preference("automatic move", "enable") - Enable automatic mouse mode.
+         * Preference("automatic move", "disable") - Disable automatic mouse mode.
+         * Preference("automatic move", "toggle") - Toggle automatic mouse mode.
+
          * Preference("wait for voice", "enable")  - Wait for the currently playing voice to complete before auto-forwarding.
          * Preference("wait for voice", "disable") - Do not wait for the currently playing voice to complete before auto-forwarding.
          * Preference("wait for voice", "toggle")  - Toggle wait voice.
@@ -78,7 +109,6 @@ init -1500 python:
          * Preference("voice sustain", "enable")  - Sustain voice past the current interaction.
          * Preference("voice sustain", "disable") - Don't sustain voice past the current interaction.
          * Preference("voice sustain", "toggle")  - Toggle voice sustain.
-
 
          * Preference("music mute", "enable") - Mute the music mixer.
          * Preference("music mute", "disable") - Un-mute the music mixer.
@@ -94,7 +124,7 @@ init -1500 python:
 
          * Preference("music volume", 0.5) - Set the music volume.
          * Preference("sound volume", 0.5) - Set the sound volume.
-         * Preference("volice volume", 0.5) - Set the voice volume.
+         * Preference("voice volume", 0.5) - Set the voice volume.
 
          Values that can be used with bars are:
 
@@ -115,6 +145,8 @@ init -1500 python:
                 return SetField(_preferences, "fullscreen", True)
             elif value == "window":
                 return __DisplayAction(1.0)
+            elif value == "any window":
+                return SetField(_preferences, "fullscreen", False)
             elif value == "toggle":
                 return ToggleField(_preferences, "fullscreen")
             elif isinstance(value, (int, float)):
@@ -130,6 +162,15 @@ init -1500 python:
                 return SetField(_preferences, "transitions", 0)
             elif value == "toggle":
                 return ToggleField(_preferences, "transitions", true_value=2, false_value=0)
+
+        elif name == "show empty window":
+
+            if value == "show":
+                return SetField(_preferences, "show_empty_window", True)
+            elif value == "hide":
+                return SetField(_preferences, "show_empty_window", False)
+            elif value == "toggle":
+                return ToggleField(_preferences, "show_empty_window")
 
         elif name == "text speed":
 
@@ -187,6 +228,24 @@ init -1500 python:
                 return SetField(_preferences, "afm_enable", False)
             elif value == "toggle":
                 return ToggleField(_preferences, "afm_enable")
+
+        elif name == "auto-forward after click":
+
+            if value == "enable":
+                return SetField(_preferences, "afm_after_click", True)
+            elif value == "disable":
+                return SetField(_preferences, "afm_after_click", False)
+            elif value == "toggle":
+                return ToggleField(_preferences, "afm_after_click")
+
+        elif name == "automatic move":
+
+            if value == "enable":
+                return SetField(_preferences, "mouse_move", True)
+            elif value == "disable":
+                return SetField(_preferences, "mouse_move", False)
+            elif value == "toggle":
+                return ToggleField(_preferences, "mouse_move")
 
         elif name == "wait for voice":
 

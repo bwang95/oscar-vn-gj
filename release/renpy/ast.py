@@ -1,4 +1,4 @@
-# Copyright 2004-2013 Tom Rothamel <pytom@bishoujo.us>
+# Copyright 2004-2014 Tom Rothamel <pytom@bishoujo.us>
 #
 # Permission is hereby granted, free of charge, to any person
 # obtaining a copy of this software and associated documentation files
@@ -31,6 +31,14 @@ import renpy.display
 import re
 import time
 import md5
+
+def statement_name(name):
+    """
+    Reports the name of this statement to systems like window auto.
+    """
+
+    for i in renpy.config.statement_callbacks:
+        i(name)
 
 def next_node(n):
     """
@@ -419,10 +427,11 @@ class Say(Node):
     def execute(self):
 
         next_node(self.next)
+        statement_name("say")
 
         try:
 
-            renpy.exports.say_attributes = self.attributes
+            renpy.game.context().say_attributes = self.attributes
 
             if self.who is not None:
                 if self.who_fast:
@@ -455,16 +464,16 @@ class Say(Node):
             renpy.exports.say(who, what, interact=self.interact)
 
         finally:
-            renpy.exports.say_attributes = None
+            renpy.game.context().say_attributes = None
 
 
     def predict(self):
 
-        old_attributes = renpy.exports.say_attributes
+        old_attributes = renpy.game.context().say_attributes
 
         try:
 
-            renpy.exports.say_attributes = self.attributes
+            renpy.game.context().say_attributes = self.attributes
 
             if self.who is not None:
                 if self.who_fast:
@@ -486,7 +495,7 @@ class Say(Node):
             renpy.exports.predict_say(who, what)
 
         finally:
-            renpy.exports.say_attributes = old_attributes
+            renpy.game.context().say_attributes = old_attributes
 
         return [ self.next ]
 
@@ -541,6 +550,7 @@ class Init(Node):
 
     def execute(self):
         next_node(self.next)
+        statement_name("init")
 
     def restructure(self, callback):
         callback(self.block)
@@ -662,6 +672,7 @@ class Label(Node):
 
     def execute(self):
         next_node(self.next)
+        statement_name("label")
 
         renpy.game.context().mark_seen()
 
@@ -715,6 +726,7 @@ class Python(Node):
 
     def execute(self):
         next_node(self.next)
+        statement_name("python")
 
         try:
             renpy.python.py_exec_bytecode(self.code.bytecode, self.hide, store=self.store)
@@ -760,6 +772,7 @@ class EarlyPython(Node):
 
     def execute(self):
         next_node(self.next)
+        statement_name("python early")
 
     def early_execute(self):
         renpy.python.create_store(self.store)
@@ -803,6 +816,7 @@ class Image(Node):
         # accessing self.atl, as self.atl may not always exist.
 
         next_node(self.next)
+        statement_name("image")
 
         if self.code is not None:
             img = renpy.python.py_eval_bytecode(self.code.bytecode)
@@ -843,6 +857,7 @@ class Transform(Node):
     def execute(self):
 
         next_node(self.next)
+        statement_name("transform")
 
         parameters = getattr(self, "parameters", None)
 
@@ -861,14 +876,15 @@ def predict_imspec(imspec, scene=False, atl=None):
     """
 
     if len(imspec) == 7:
-        name, expression, tag, _at_list, layer, _zorder, _behind = imspec
+        name, expression, tag, at_expr_list, layer, _zorder, _behind = imspec
 
     elif len(imspec) == 6:
-        name, expression, tag, _at_list, layer, _zorder = imspec
+        name, expression, tag, at_expr_list, layer, _zorder = imspec
 
     elif len(imspec) == 3:
-        name, _at_list, layer = imspec
-
+        name, at_expr_list, layer = imspec
+        tag = None
+        expression = None
 
     if expression:
         try:
@@ -876,30 +892,27 @@ def predict_imspec(imspec, scene=False, atl=None):
             img = renpy.easy.displayable(img)
         except:
             return
-
     else:
-        img = renpy.display.image.images.get(name, None)
-        if img is None:
-            return
+        img = None
 
-    full_name = name
-    if tag:
-        full_name = (tag,) + full_name[1:]
+    at_list = [ ]
+    for i in at_expr_list:
+        try:
+            at_list.append(renpy.python.py_eval(i))
+        except:
+            pass
+
+
+    if atl is not None:
+        try:
+            at_list.append(renpy.display.motion.ATLTransform(atl))
+        except:
+            pass
 
     if scene:
         renpy.game.context().images.predict_scene(layer)
 
-    renpy.game.context().images.predict_show(tag or name, layer)
-
-    if atl is not None:
-        try:
-            img = renpy.display.motion.ATLTransform(atl, child=img)
-        except:
-            import traceback
-            traceback.print_exc()
-
-    renpy.display.predict.displayable(img)
-
+    renpy.exports.predict_show(name, layer, what=img, tag=tag)
 
 
 def show_imspec(imspec, atl=None):
@@ -961,11 +974,46 @@ class Show(Node):
 
     def execute(self):
         next_node(self.next)
+        statement_name("show")
 
         show_imspec(self.imspec, atl=getattr(self, "atl", None))
 
     def predict(self):
         predict_imspec(self.imspec, atl=getattr(self, "atl", None))
+        return [ self.next ]
+
+
+class ShowLayer(Node):
+
+    __slots__ = [
+        'layer',
+        'at_list',
+        'atl',
+        ]
+
+    def __init__(self, loc, layer, at_list, atl):
+        super(ShowLayer, self).__init__(loc)
+
+        self.layer = layer
+        self.at_list = at_list
+        self.atl = atl
+
+    def diff_info(self):
+        return (ShowLayer, self.layer)
+
+    def execute(self):
+        next_node(self.next)
+        statement_name("show layer")
+
+        at_list = [ renpy.python.py_eval(i) for i in self.at_list ]
+
+        if self.atl is not None:
+            atl = renpy.display.motion.ATLTransform(self.atl)
+            at_list.append(atl)
+
+        renpy.exports.layer_at_list(at_list, layer=self.layer)
+
+    def predict(self):
         return [ self.next ]
 
 
@@ -1002,6 +1050,7 @@ class Scene(Node):
     def execute(self):
 
         next_node(self.next)
+        statement_name("scene")
 
         renpy.config.scene(self.layer)
 
@@ -1061,6 +1110,7 @@ class Hide(Node):
     def execute(self):
 
         next_node(self.next)
+        statement_name("hide")
 
         if len(self.imspec) == 3:
             name, _at_list, layer = self.imspec
@@ -1101,6 +1151,7 @@ class With(Node):
     def execute(self):
 
         next_node(self.next)
+        statement_name("with")
 
         trans = renpy.python.py_eval(self.expr)
 
@@ -1149,6 +1200,8 @@ class Call(Node):
         return (Call, self.label, self.expression)
 
     def execute(self):
+
+        statement_name("call")
 
         label = self.label
         if self.expression:
@@ -1223,6 +1276,8 @@ class Return(Node):
 
     def execute(self):
 
+        statement_name("return")
+
         if self.expression:
             renpy.store._return = renpy.python.py_eval(self.expression)
         else:
@@ -1284,6 +1339,7 @@ class Menu(Node):
     def execute(self):
 
         next_node(self.next)
+        statement_name("menu")
 
         choices = [ ]
         narration = [ ]
@@ -1369,6 +1425,8 @@ class Jump(Node):
 
     def execute(self):
 
+        statement_name("jump")
+
         target = self.target
         if self.expression:
             target = renpy.python.py_eval(target)
@@ -1405,6 +1463,7 @@ class Pass(Node):
 
     def execute(self):
         next_node(self.next)
+        statement_name("pass")
 
 
 class While(Node):
@@ -1433,6 +1492,7 @@ class While(Node):
     def execute(self):
 
         next_node(self.next)
+        statement_name("while")
 
         if renpy.python.py_eval(self.condition):
             next_node(self.block[0])
@@ -1481,6 +1541,7 @@ class If(Node):
     def execute(self):
 
         next_node(self.next)
+        statement_name("if")
 
         for condition, block in self.entries:
             if renpy.python.py_eval(condition):
@@ -1529,11 +1590,17 @@ class UserStatement(Node):
 
     def execute(self):
         next_node(self.get_next())
+        statement_name(self.get_name())
 
         self.call("execute")
 
     def predict(self):
-        self.call("predict")
+        predictions = self.call("predict")
+
+        if predictions is not None:
+            for i in predictions:
+                renpy.easy.predict(i)
+
         return [ self.get_next() ]
 
     def call(self, method, *args, **kwargs):
@@ -1544,6 +1611,14 @@ class UserStatement(Node):
             self.parsed = parsed
 
         renpy.statements.call(method, parsed, *args, **kwargs)
+
+    def get_name(self):
+        parsed = self.parsed
+        if parsed is None:
+            parsed = renpy.statements.parse(self, self.line, self.block)
+            self.parsed = parsed
+
+        return renpy.statements.get_name(parsed)
 
     def get_next(self):
         rv = self.call("next")
@@ -1588,6 +1663,7 @@ class Define(Node):
     def execute(self):
 
         next_node(self.next)
+        statement_name("define")
 
         value = renpy.python.py_eval_bytecode(self.code.bytecode)
         renpy.dump.definitions.append((self.varname, self.filename, self.linenumber))
@@ -1617,6 +1693,8 @@ class Screen(Node):
 
     def execute(self):
         next_node(self.next)
+        statement_name("screen")
+
         self.screen.define()
         renpy.dump.screens.append((self.screen.name, self.filename, self.linenumber))
 
@@ -1661,11 +1739,14 @@ class Translate(Node):
 
     def execute(self):
 
+        statement_name("translate")
+
         if self.language is not None:
             next_node(self.next)
             raise Exception("Translation nodes cannot be run directly.")
 
         next_node(renpy.game.script.translator.lookup_translate(self.identifier))
+
         renpy.game.context().translate_identifier = self.identifier
 
     def predict(self):
@@ -1698,6 +1779,8 @@ class EndTranslate(Node):
 
     def execute(self):
         next_node(self.next)
+        statement_name("end translate")
+
         renpy.game.context().translate_identifier = None
 
 
@@ -1723,6 +1806,8 @@ class TranslateString(Node):
 
     def execute(self):
         next_node(self.next)
+        statement_name("translate string")
+
         renpy.translation.add_string_translation(self.language, self.old, self.new)
 
 class TranslatePython(Node):
@@ -1750,7 +1835,81 @@ class TranslatePython(Node):
 
     def execute(self):
         next_node(self.next)
+        statement_name("translate_python")
 
     # def early_execute(self):
     #    renpy.python.create_store(self.store)
     #    renpy.python.py_exec_bytecode(self.code.bytecode, self.hide, store=self.store)
+
+class Style(Node):
+
+    __slots__ = [
+        'style_name',
+        'parent',
+        'properties',
+        'clear',
+        'take',
+        'delattr',
+        'variant',
+    ]
+
+    def __init__(self, loc, name):
+        """
+        `name`
+            The name of the style to define.
+        """
+
+        super(Style, self).__init__(loc)
+
+        self.style_name = name
+
+        # The parent of this style.
+        self.parent = None
+
+        # Properties.
+        self.properties = { }
+
+        # Should we clear the style?
+        self.clear = False
+
+        # Should we take properties from another style?
+        self.take = None
+
+        # A list of attributes we should delete from this style.
+        self.delattr = [ ]
+
+        # If not none, an expression for the variant.
+        self.variant = None
+
+    def diff_info(self):
+        return (Style, self.style_name)
+
+    def execute(self):
+        next_node(self.next)
+        statement_name("style")
+
+        if self.variant is not None:
+            variant = renpy.python.py_eval(self.variant)
+            if not renpy.exports.variant(variant):
+                return
+
+        s = renpy.style.get_or_create_style(self.style_name) # @UndefinedVariable
+
+        if self.clear:
+            s.clear()
+
+        if self.parent is not None:
+            s.set_parent(self.parent)
+
+        if self.take is not None:
+            s.take(self.take)
+
+        for i in self.delattr:
+            s.delattr(i)
+
+        if self.properties:
+            properties = { }
+            for name, expr in self.properties.items():
+                properties[name] = renpy.python.py_eval(expr)
+
+            s.add_properties(properties)
