@@ -2,8 +2,16 @@
 errors listed below, and try again.
 
 
-File "game/script.rpy", line 323: choice menuitem expects a non-empty block.
-    "Follow Rosemary":
-                      ^
+File "game/script.rpy", line 456: Line is followed by a block, despite not being a menu choice. Did you forget a colon at the end of the line?
+    "Warn Flannery"
+                   ^
 
-Ren'Py Version: Ren'Py 6.17.0.282
+File "game/script.rpy", line 473: play requires a channel
+    play "../sound/music/Suspense 1.MP3"
+         ^
+
+File "game/script.rpy", line 501: Line is indented, but the preceding say statement statement does not expect a block. Please check this line's indentation.
+    menu:
+    ^
+
+Ren'Py Version: Ren'Py 6.16.5.525
