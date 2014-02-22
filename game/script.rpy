@@ -38,24 +38,32 @@ define ro= Character('Rose',color="#FF66FF")
 # The game starts here.
 label start:
     scene bg kitties
+    play voice "../sound/voice/Slide0.mp3"
     b "I remember when you and he were just young’uns. 
        I remember the day your human stepped past my corner with a 
        basket in one arm and a bag of smell-goods in the other. You 
        two were barely balls of fur at first sight,hardly even breathin’."
+    stop voice
     scene bg run with fade
+    play voice "../sound/voice/Slide1.mp3"
     b "But boy could you run. Within a few nights, your brother Oscar was 
        leadin’ you every which way, even into my den on some occasions. 
        You and he were thick as thieves, you were."
+    stop voice
     scene bg together with fade
+    play voice "../sound/voice/Slide2.mp3"
     b " You did everything together. Played, ate, everything. Even played 
        jokes on this old man here. Boy, I remember when you kittens snuck 
        up on me and...well, I’m getting off track. You and he, I never saw 
        a family bond as strong as yours. Even the entrance of that fine feline 
        Rosemary didn’ change nothin’. "
+    stop voice
     scene bg rose with fade
+    play voice "../sound/voice/Slide3.mp3"
     b "She was the prettiest thing I ever saw, but she only had eyes for Oscar 
        and he sure had eyes for her as well. He loved her and she darn loved him 
        back, and you, were the happy third leg all the way."
+    stop voice
     scene bg truck with fade
     b "Well lookie here, young’un. I think you might have a new playmate. More 
        humans are movin’ in and they have a young’un with them too. You should
