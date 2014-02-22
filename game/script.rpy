@@ -17,7 +17,7 @@ image Rosemary smile="../art/char/Rosemary-happy.gif"
 image Rosemary worried="../art/char/Rosemary-worried.gif"
 
 #backgrounds
-image bg blackness="../art/bg/blackness.jpg./"
+image bg blackness="../art/bg/Blackness.jpg."
 image bg alley="../art/bg/Alley.jpg"
 image bg kitties="../art/bg/Kittens.jpg"
 image bg run="../art/bg/running kitties.jpg."
@@ -159,7 +159,7 @@ label start:
             something nice and fun! You could just give me a chance! 
             Fine. If you are so desperate to not be friends, then I’ll just leave. 
             Have a nice life!"
-            scene blackness with dissolve
+            scene bg blackness with dissolve
             b "Well, where did you go wrong? you lost a friend, but you were able to 
                get over that and live a really happy life with Oscar and Rosemary. ...Or do you?"
             jump badEnd
