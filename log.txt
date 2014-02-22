@@ -1,19 +1,11 @@
-<<<<<<< HEAD
-Sat Feb 22 01:14:57 2014
-=======
-Fri Feb 21 22:20:08 2014
->>>>>>> d496b2ab1dbe268c0e95531d55edf25a9619d8ac
+Sat Feb 22 01:22:47 2014
 Windows-post2008Server-6.2.9200
 Ren'Py 6.16.5.525
 Oscar 0.0
 
 
 Windowed mode.
-<<<<<<< HEAD
-Screen sizes: virtual=(800, 600) physical=(780, 585)
-=======
 Screen sizes: virtual=(800, 600) physical=(800, 600)
->>>>>>> d496b2ab1dbe268c0e95531d55edf25a9619d8ac
 Vendor: 'Intel'
 Renderer: 'Intel(R) HD Graphics 4600'
 Version: '4.2.0 - Build 10.18.10.3345'
@@ -208,24 +200,11 @@ Texture testing:
 Performance test:
 - Target is 5 frames in 0.333333333333 seconds.
 - Frame drawn at 0.000000 seconds.
-<<<<<<< HEAD
-- Frame drawn at 0.018000 seconds.
-- Frame drawn at 0.029000 seconds.
+- Frame drawn at 0.019000 seconds.
+- Frame drawn at 0.028000 seconds.
+- Frame drawn at 0.030000 seconds.
 - Frame drawn at 0.031000 seconds.
-- Frame drawn at 0.032000 seconds.
-- 0.032000 seconds to render 5 frames.
-The window was minimized.
-The window was restored.
-
-Windowed mode.
-Screen sizes: virtual=(800, 600) physical=(781, 585)
-=======
-- Frame drawn at 0.012000 seconds.
-- Frame drawn at 0.020000 seconds.
-- Frame drawn at 0.021000 seconds.
-- Frame drawn at 0.022000 seconds.
-- 0.022000 seconds to render 5 frames.
->>>>>>> d496b2ab1dbe268c0e95531d55edf25a9619d8ac
+- 0.031000 seconds to render 5 frames.
 Deallocating textures.
 Done deallocating textures.
 About to quit GL.

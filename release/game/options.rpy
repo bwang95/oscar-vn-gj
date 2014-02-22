@@ -72,12 +72,12 @@ init -1 python hide:
         ## The background of the main menu. This can be a color
         ## beginning with '#', or an image filename. The latter
         ## should take up the full height and width of the screen.
-        mm_root = "#594f4f",
+        mm_root = "../art/oscar logo.png",
 
         ## The background of the game menu. This can be a color
         ## beginning with '#', or an image filename. The latter
         ## should take up the full height and width of the screen.
-        gm_root = "#594f4f",
+        gm_root = "../art/oscar logo.png",
 
         ## If this is True, the in-game window is rounded. If False,
         ## the in-game window is square.
