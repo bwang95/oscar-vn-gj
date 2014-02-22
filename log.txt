@@ -205,11 +205,8 @@ Performance test:
 - Frame drawn at 0.011000 seconds.
 - Frame drawn at 0.012000 seconds.
 - 0.012000 seconds to render 5 frames.
-Deallocating textures.
-Done deallocating textures.
-About to quit GL.
-Finished quit GL.
-renpy-6.16.5-sdk\renpy\execution.py", line 294, in run
+Traceback (most recent call last):
+  File "C:\Users\Brian\Documents\Programming\Libraries\renpy-6.16.5-sdk\renpy\execution.py", line 294, in run
     node.execute()
   File "C:\Users\Brian\Documents\Programming\Libraries\renpy-6.16.5-sdk\renpy\ast.py", line 440, in execute
     raise Exception("Sayer '%s' is not defined." % self.who.encode("utf-8"))
@@ -421,10 +418,6 @@ Performance test:
 - Frame drawn at 0.018000 seconds.
 - 0.018000 seconds to render 5 frames.
 Deallocating textures.
-Done deallocating textures.
-About to quit GL.
-Finished quit GL.
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      Deallocating textures.
 Done deallocating textures.
 About to quit GL.
 Finished quit GL.
