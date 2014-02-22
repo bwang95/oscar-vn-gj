@@ -1,4 +1,4 @@
-# Copyright 2004-2013 Tom Rothamel <pytom@bishoujo.us>
+# Copyright 2004-2014 Tom Rothamel <pytom@bishoujo.us>
 #
 # Permission is hereby granted, free of charge, to any person
 # obtaining a copy of this software and associated documentation files
@@ -265,11 +265,6 @@ text_layout = None
 # A callback that is called 20 times a second.
 periodic_callback = None
 
-# A dictionary, mapping from style property to functions (which map
-# arguments to values) or to None to indicate no such function is
-# necessary.
-style_properties = None
-
 # Should we check that all style properties are in style_properties? (Internal)
 check_properties = True
 
@@ -485,12 +480,21 @@ voice_tag_callback = None
 # A list of callbacks that can be used to add JSON to save files.
 save_json_callbacks = [ ]
 
-# The location (or set of locations) that we save to. This is a
+# The duration of a longpress, in seconds.
+longpress_duration = .5
+
+# The radius the longpress has to remain within, in pixels.
+longpress_radius = 15
+
+# How long we vibrate the device upon a longpress.
+longpress_vibrate = .1
+
+# A list of callbacks that are called before each statement, with the name
+# of the statement.
+statement_callbacks = [ ]
 
 del renpy
 del os
 
 def init():
-    import renpy # W0404 @Reimport
-    global style_properties
-    style_properties = renpy.style.style_properties
+    pass

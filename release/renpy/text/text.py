@@ -1,4 +1,4 @@
-# Copyright 2004-2013 Tom Rothamel <pytom@bishoujo.us>
+# Copyright 2004-2014 Tom Rothamel <pytom@bishoujo.us>
 #
 # Permission is hereby granted, free of charge, to any person
 # obtaining a copy of this software and associated documentation files
@@ -413,12 +413,21 @@ class Layout(object):
     Represents the layout of text.
     """
 
-    def __init__(self, text, width, height, renders):
+    def __init__(self, text, width, height, renders, size_only=False):
         """
         `text`
             The text object this layout is associated with.
+
         `width`, `height`
             The height of the laid-out text.
+
+        `renders`
+            A map from displayable to its render.
+
+        `size_only`
+            If true, layout will stop once the size field is filled
+            out. The object will only be suitable for sizing, as it
+            will be missing the textures required to render it.
         """
 
         style = text.style
@@ -610,9 +619,13 @@ class Layout(object):
         sw, sh = size = (maxx + self.xborder, y + self.yborder)
         self.size = size
 
+        # If we only care about the size, we're done.
+        if size_only:
+            return
+
+        # Place ruby.
         if self.has_ruby:
             textsupport.place_ruby(all_glyphs, style.ruby_style.yoffset, sw, sh)
-
 
         # Check for glyphs that are being drawn out of bounds, because the font
         # or anti-aliasing or whatever makes them bigger than the bounding box. If
@@ -682,7 +695,9 @@ class Layout(object):
         # Log an overflow if the laid out width or height is larger than the
         # size of the provided area.
         if renpy.config.debug_text_overflow:
-            if sw > width or sh > height:
+            ow, oh = self.size
+
+            if ow > width or oh > height:
                 filename, line = renpy.exports.get_filename_line()
 
                 renpy.display.to_log.write("")
@@ -1179,6 +1194,21 @@ class Text(renpy.display.core.Displayable):
         # The list of displayables we use.
         self.displayables = None
 
+    def __unicode__(self):
+        s = ""
+
+        for i in self.text:
+            if isinstance(s, basestring):
+                s += i
+
+            if len(s) > 25:
+                s = s[:24] + u"\u2026"
+                break
+
+        s = s.replace("\\", "\\\\").replace("\"", "\\\"").replace("\n", "\\n")
+        return u"Text \"{}\"".format(s)
+
+
     def set_text(self, text, scope=None, substitute=False):
 
         if not isinstance(text, list):
@@ -1371,6 +1401,26 @@ class Text(renpy.display.core.Displayable):
 
                 rv = self.style.hyperlink_functions[1](target)
                 return rv
+
+    def size(self, width=4096, height=4096, st=0, at=0):
+        """
+        Attempts to figure out the size of the text. The parameters are
+        as for render.
+
+        This does not rotate vertical text.
+        """
+
+        if self.dirty or self.displayables is None:
+            self.update()
+
+        renders = { }
+
+        for i in self.displayables:
+            renders[i] = renpy.display.render.render(i, width, self.style.size, st, at)
+
+        layout = Layout(self, width, height, renders, size_only=True)
+
+        return layout.size
 
     def render(self, width, height, st, at):
 

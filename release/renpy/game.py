@@ -1,4 +1,4 @@
-# Copyright 2004-2013 Tom Rothamel <pytom@bishoujo.us>
+# Copyright 2004-2014 Tom Rothamel <pytom@bishoujo.us>
 #
 # Permission is hereby granted, free of charge, to any person
 # obtaining a copy of this software and associated documentation files
@@ -127,11 +127,15 @@ class QuitException(Exception):
     `relaunch`
         If given, the program will run another copy of itself, with the
         same arguments.
+
+    `status`
+        The status code Ren'Py will return to the operating system.
     """
 
-    def __init__(self, relaunch=False):
+    def __init__(self, relaunch=False, status=0):
         Exception.__init__(self)
         self.relaunch = relaunch
+        self.status = status
 
 class JumpException(Exception):
     """

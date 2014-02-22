@@ -1,4 +1,4 @@
-# Copyright 2004-2013 Tom Rothamel <pytom@bishoujo.us>
+# Copyright 2004-2014 Tom Rothamel <pytom@bishoujo.us>
 #
 # Permission is hereby granted, free of charge, to any person
 # obtaining a copy of this software and associated documentation files
@@ -31,6 +31,9 @@ interface = None
 
 # Should we disable imagedissolve-type transitions?
 less_imagedissolve = False
+
+# Are we on a touchscreen?
+touch = False
 
 # Logs we use.
 log = renpy.log.open("log", developer=False, append=False)

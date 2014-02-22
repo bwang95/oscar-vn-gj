@@ -1,4 +1,4 @@
-# Copyright 2004-2013 Tom Rothamel <pytom@bishoujo.us>
+# Copyright 2004-2014 Tom Rothamel <pytom@bishoujo.us>
 #
 # Permission is hereby granted, free of charge, to any person
 # obtaining a copy of this software and associated documentation files
@@ -25,7 +25,7 @@ class Preferences(renpy.object.Object):
     """
     Stores preferences that will one day be persisted.
     """
-    __version__ = 7
+    __version__ = 11
 
     def after_upgrade(self, version):
         if version < 1:
@@ -43,6 +43,12 @@ class Preferences(renpy.object.Object):
             self.wait_voice = True
         if version < 7:
             self.voice_sustain = False
+        if version < 8:
+            self.mouse_move = False
+        if version < 9:
+            self.afm_after_click = False
+        if version < 11:
+            self.show_empty_window = True
 
     def __init__(self):
         self.fullscreen = False
@@ -51,13 +57,14 @@ class Preferences(renpy.object.Object):
         self.afm_time = 0
         self.afm_enable = True
         self.voice_sustain = False
+        self.mouse_move = False
+        self.show_empty_window = True
 
         # Should we wait for the voice to stop?
         self.wait_voice = True
 
-        # These will be going away soon.
-        self.sound = True
-        self.music = True
+        # Should we disengage auto-forward mode after a click?
+        self.afm_after_click = False
 
         # 2 - All transitions.
         # 1 - Only non-default transitions.

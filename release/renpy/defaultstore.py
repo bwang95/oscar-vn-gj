@@ -1,4 +1,4 @@
-# Copyright 2004-2013 Tom Rothamel <pytom@bishoujo.us>
+# Copyright 2004-2014 Tom Rothamel <pytom@bishoujo.us>
 #
 # Permission is hereby granted, free of charge, to any person
 # obtaining a copy of this software and associated documentation files
@@ -107,6 +107,7 @@ Image = renpy.display.im.image
 
 Frame = renpy.display.imagelike.Frame
 Solid = renpy.display.imagelike.Solid
+FileCurrentScreenshot = renpy.display.imagelike.FileCurrentScreenshot
 
 LiveComposite = renpy.display.layout.LiveComposite
 LiveCrop = renpy.display.layout.LiveCrop
@@ -179,7 +180,7 @@ MultiPersistent = renpy.persistent.MultiPersistent
 Action = renpy.ui.Action
 BarValue = renpy.ui.BarValue
 
-Style = renpy.style.Style
+Style = renpy.style.Style # @UndefinedVariable
 
 absolute = renpy.display.core.absolute
 

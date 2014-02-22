@@ -1,5 +1,23 @@
-# Copyright 2004-2013 Tom Rothamel <pytom@bishoujo.us>
-# See LICENSE.txt for license details.
+﻿# Copyright 2004-2014 Tom Rothamel <pytom@bishoujo.us>
+#
+# Permission is hereby granted, free of charge, to any person
+# obtaining a copy of this software and associated documentation files
+# (the "Software"), to deal in the Software without restriction,
+# including without limitation the rights to use, copy, modify, merge,
+# publish, distribute, sublicense, and/or sell copies of the Software,
+# and to permit persons to whom the Software is furnished to do so,
+# subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be
+# included in all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+# EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+# MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+# NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+# LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+# OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+# WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 init -1500 python:
 
@@ -33,14 +51,17 @@ init -1500 python:
          ShowMenu without an argument will enter the game menu at the
          default screen, taken from _game_menu_screen.
 
+         Extra arguments and kewyord arguments are passed on to the screen
          """
 
-        def __init__(self, screen=None):
+        def __init__(self, screen=None, *args, **kwargs):
             self.screen = screen
+            self.args = args
+            self.kwargs = kwargs
 
         def predict(self):
             if renpy.has_screen(self.screen):
-                renpy.predict_screen(self.screen)
+                renpy.predict_screen(self.screen, *self.args, **self.kwargs)
 
         def __call__(self):
 
@@ -59,7 +80,7 @@ init -1500 python:
                 if renpy.has_screen(screen):
 
                     renpy.transition(config.intra_transition)
-                    renpy.show_screen(screen, _transient=True)
+                    renpy.show_screen(screen, _transient=True, *self.args, **self.kwargs)
                     renpy.restart_interaction()
 
                 elif renpy.has_label(screen):
@@ -75,7 +96,7 @@ init -1500 python:
                     raise Exception("%r is not a screen or a label." % orig_screen)
 
             else:
-                renpy.call_in_new_context("_game_menu", _game_menu_screen=screen)
+                renpy.call_in_new_context("_game_menu", *self.args, _game_menu_screen=screen, **self.kwargs)
 
         def get_selected(self):
             return renpy.get_screen(self.screen)

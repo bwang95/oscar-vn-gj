@@ -1,4 +1,4 @@
-# Copyright 2004-2013 Tom Rothamel <pytom@bishoujo.us>
+# Copyright 2004-2014 Tom Rothamel <pytom@bishoujo.us>
 #
 # Permission is hereby granted, free of charge, to any person
 # obtaining a copy of this software and associated documentation files
@@ -105,6 +105,16 @@ def predict_show_display_say(who, what, who_args, what_args, window_args, image=
     list of images used by show_display_say.
     """
 
+    if side_image:
+        renpy.easy.predict(side_image)
+
+    if renpy.store._side_image_attributes:
+        renpy.easy.predict(renpy.display.image.ImageReference(("side",) + renpy.store._side_image_attributes))
+
+    if image:
+        if image != "<Dynamic>":
+            renpy.easy.predict(who)
+
     if screen:
         props = compute_widget_properties(who_args, what_args, window_args)
 
@@ -120,12 +130,6 @@ def predict_show_display_say(who, what, who_args, what_args, window_args, image=
 
         return
 
-    if image:
-        if image != "<Dynamic>":
-            renpy.easy.predict(who)
-
-    if side_image:
-        renpy.easy.predict(side_image)
 
 
 def compute_widget_properties(who_args, what_args, window_args, variant=None):
@@ -347,8 +351,9 @@ def display_say(
     ctc_timedpause=None,
     ctc_force=False):
 
-    if (not renpy.game.preferences.skip_unseen) and (not renpy.game.context().seen_current(True)) and renpy.config.skipping == "fast":
+    if interact and (not renpy.game.preferences.skip_unseen) and (not renpy.game.context().seen_current(True)) and renpy.config.skipping == "fast":
         renpy.config.skipping = None
+
     # If we're in fast skipping mode, don't bother with say
     # statements at all.
     if interact and renpy.config.skipping == "fast":
@@ -828,7 +833,7 @@ class ADVCharacter(object):
         old_side_image_attributes = renpy.store._side_image_attributes
 
         if self.image_tag:
-            attrs = self.image_tag + renpy.game.context().images.get_attributes("master", self.image_tag)
+            attrs = ( self.image_tag, ) + renpy.game.context().images.get_attributes("master", self.image_tag)
         else:
             attrs = None
 

@@ -1,4 +1,4 @@
-# Copyright 2004-2013 Tom Rothamel <pytom@bishoujo.us>
+# Copyright 2004-2014 Tom Rothamel <pytom@bishoujo.us>
 #
 # Permission is hereby granted, free of charge, to any person
 # obtaining a copy of this software and associated documentation files
@@ -24,6 +24,7 @@ import sys
 import cStringIO
 import platform
 import traceback
+import subprocess
 import io
 
 FSENCODING = sys.getfilesystemencoding() or "utf-8"
@@ -221,6 +222,7 @@ def bootstrap(renpy_base):
     if renpy.macintosh:
         os.startfile = mac_start
 
+
     # Check that we have installed pygame properly. This also deals with
     # weird cases on Windows and Linux where we can't import modules. (On
     # windows ";" is a directory separator in PATH, so if it's in a parent
@@ -233,7 +235,24 @@ def bootstrap(renpy_base):
 Could not import pygame. Please ensure that this program has been built
 and unpacked properly. Also, make sure that the directories containing
 this program do not contain : or ; in their names.
-"""
+
+You may be using a system install of python. Please run {0}.sh,
+{0}.exe, or {0}.app instead.
+""".format(name)
+
+        raise
+
+    # Ditto for the Ren'Py module.
+    try:
+        import _renpy; _renpy
+    except:
+        print >>sys.stderr, """\
+Could not import _renpy. Please ensure that this program has been built
+and unpacked properly.
+
+You may be using a system install of python. Please run {0}.sh,
+{0}.exe, or {0}.app instead.
+""".format(name)
         raise
 
     # Load up all of Ren'Py, in the right order.
@@ -243,10 +262,12 @@ this program do not contain : or ; in their names.
 
     renpy.loader.init_importer()
 
-    keep_running = True
+    exit_status = None
 
     try:
-        while keep_running:
+        while exit_status is None:
+            exit_status = 1
+
             try:
                 renpy.game.args = args
                 renpy.config.renpy_base = renpy_base
@@ -263,11 +284,11 @@ this program do not contain : or ; in their names.
                     os.makedirs(renpy.config.logdir, 0777)
 
                 renpy.main.main()
-                keep_running = False
+
+                exit_status = 0
 
             except KeyboardInterrupt:
-                traceback.print_exc()
-                break
+                raise
 
             except renpy.game.UtterRestartException:
 
@@ -277,19 +298,23 @@ this program do not contain : or ; in their names.
 
                 # On an UtterRestart, reload Ren'Py.
                 renpy.reload_all()
-                continue
 
-            except renpy.game.QuitException:
-                keep_running = False
+                exit_status = None
+
+            except renpy.game.QuitException as e:
+                exit_status = e.status
+
+                if e.relaunch:
+                    subprocess.Popen([sys.executable, "-EO"] + sys.argv)
 
             except renpy.game.ParseErrorException:
-                keep_running = False
+                pass
 
             except Exception, e:
                 report_exception(e)
-                keep_running = False
+                pass
 
-        sys.exit(0)
+        sys.exit(exit_status)
 
     finally:
 
@@ -303,8 +328,7 @@ this program do not contain : or ; in their names.
 
         # Prevent subprocess from throwing errors while trying to run it's
         # __del__ method during shutdown.
-        import subprocess # W0403
-        subprocess.Popen.__del__ = popen_del # E1101
+        subprocess.Popen.__del__ = popen_del
 
 def report_line(out, filename, line, what):
     out.write('  File "%s", line %d, in %s\n' % (filename, line, what))

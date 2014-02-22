@@ -1,4 +1,4 @@
-# Copyright 2004-2013 Tom Rothamel <pytom@bishoujo.us>
+# Copyright 2004-2014 Tom Rothamel <pytom@bishoujo.us>
 #
 # Permission is hereby granted, free of charge, to any person
 # obtaining a copy of this software and associated documentation files
@@ -28,6 +28,8 @@ import renpy.audio
 from renpy.display.render import render, Render
 
 import pygame
+
+import math
 
 def compile_event(key, keydown):
     """
@@ -435,7 +437,10 @@ class SayBehavior(renpy.display.layout.Null):
                     renpy.exports.restart_interaction()
                     raise renpy.display.core.IgnoreEvent()
 
-                if renpy.game.preferences.using_afm_enable and renpy.game.preferences.afm_enable:
+                if renpy.game.preferences.using_afm_enable and \
+                    renpy.game.preferences.afm_enable and \
+                    not renpy.game.preferences.afm_after_click:
+
                     renpy.game.preferences.afm_enable = False
                     renpy.exports.restart_interaction()
                     raise renpy.display.core.IgnoreEvent()
@@ -471,10 +476,15 @@ class Button(renpy.display.layout.Window):
 
     keymap = { }
     action = None
+    alternate = None
+
+    longpress_start = None
+    longpress_x = None
+    longpress_y = None
 
     def __init__(self, child=None, style='button', clicked=None,
                  hovered=None, unhovered=None, action=None, role=None,
-                 time_policy=None, keymap={},
+                 time_policy=None, keymap={}, alternate=None,
                  **properties):
 
         super(Button, self).__init__(child, style=style, **properties)
@@ -498,10 +508,11 @@ class Button(renpy.display.layout.Window):
                 role = ''
 
         self.action = action
-        self.activated = False
         self.clicked = clicked
         self.hovered = hovered
         self.unhovered = unhovered
+        self.alternate = alternate
+
         self.focusable = clicked is not None
         self.role = role
         self.keymap = keymap
@@ -512,6 +523,7 @@ class Button(renpy.display.layout.Window):
         predict_action(self.clicked)
         predict_action(self.hovered)
         predict_action(self.unhovered)
+        predict_action(self.alternate)
 
         if self.keymap:
             for v in self.keymap.itervalues():
@@ -540,8 +552,14 @@ class Button(renpy.display.layout.Window):
             if mask is True:
                 mask = rv
             elif mask is not None:
-                mask = renpy.easy.displayable(mask)
-                mask = renpy.display.render.render(mask, rv.width, rv.height, st, at)
+                try:
+                    mask = renpy.easy.displayable(mask)
+                    mask = renpy.display.render.render(mask, rv.width, rv.height, st, at)
+                except:
+                    if callable(mask):
+                        mask = mask
+                    else:
+                        raise Exception("Focus_mask must be None, True, a displayable, or a callable.")
 
             if mask is not None:
                 fmx = 0
@@ -560,9 +578,6 @@ class Button(renpy.display.layout.Window):
     def focus(self, default=False):
         super(Button, self).focus(default)
 
-        if self.activated:
-            return None
-
         rv = None
 
         if not default:
@@ -577,8 +592,7 @@ class Button(renpy.display.layout.Window):
     def unfocus(self, default=False):
         super(Button, self).unfocus(default)
 
-        if self.activated:
-            return None
+        self.longpress_start = None
 
         if not default:
             run_unhovered(self.hovered)
@@ -597,6 +611,17 @@ class Button(renpy.display.layout.Window):
         super(Button, self).per_interact()
 
     def event(self, ev, x, y, st):
+
+        def handle_click(action):
+            if self.style.activate_sound:
+                renpy.audio.music.play(self.style.activate_sound, channel="sound")
+
+            rv = run(action)
+
+            if rv is not None:
+                return rv
+            else:
+                raise renpy.display.core.IgnoreEvent()
 
         # Call self.action.periodic()
         timeout = run_periodic(self.action, st)
@@ -620,32 +645,38 @@ class Button(renpy.display.layout.Window):
             if map_event(ev, name):
                 return run(action)
 
+        # Handle the longpress event, if necessary.
+        if (self.alternate is not None) and renpy.display.touch:
+
+            if ev.type == pygame.MOUSEBUTTONDOWN and ev.button == 1:
+                self.longpress_start = st
+                self.longpress_x = x
+                self.longpress_y = y
+
+                renpy.game.interface.timeout(renpy.config.longpress_duration)
+
+            if self.longpress_start is not None:
+                if math.hypot(x - self.longpress_x, y - self.longpress_y) > renpy.config.longpress_radius:
+                    self.longpress_start = None
+                elif st >= (self.longpress_start + renpy.config.longpress_duration):
+                    renpy.exports.vibrate(renpy.config.longpress_vibrate)
+                    renpy.display.interface.after_longpress()
+
+                    return handle_click(self.alternate)
+
         # Ignore as appropriate:
-        if map_event(ev, "button_ignore") and self.clicked:
+        if (self.clicked is not None) and map_event(ev, "button_ignore"):
+            raise renpy.display.core.IgnoreEvent()
+
+        if (self.clicked is not None) and map_event(ev, "button_alternate_ignore"):
             raise renpy.display.core.IgnoreEvent()
 
         # If clicked,
-        if map_event(ev, "button_select") and self.clicked:
+        if (self.clicked is not None) and map_event(ev, "button_select"):
+            return handle_click(self.clicked)
 
-            self.activated = True
-            self.style.set_prefix(self.role + 'activate_')
-
-            if self.style.sound:
-                renpy.audio.music.play(self.style.sound, channel="sound")
-
-            rv = run(self.clicked)
-
-            if rv is not None:
-                return rv
-            else:
-                self.activated = False
-
-                if self.is_focused():
-                    self.set_style_prefix(self.role + "hover_", True)
-                else:
-                    self.set_style_prefix(self.role + "idle_", True)
-
-                raise renpy.display.core.IgnoreEvent()
+        if (self.alternate is not None) and map_event(ev, "button_alternate"):
+            return handle_click(self.alternate)
 
         return None
 
@@ -736,6 +767,8 @@ class Input(renpy.text.text.Text): #@UndefinedVariable
     prefix = ""
     suffix = ""
     caret_pos = 0
+    old_caret_pos = 0
+    pixel_width = None
 
     def __init__(self,
                  default="",
@@ -749,6 +782,7 @@ class Input(renpy.text.text.Text): #@UndefinedVariable
                  button=None,
                  replaces=None,
                  editable=True,
+                 pixel_width=None,
                  **properties):
 
         super(Input, self).__init__("", style=style, replaces=replaces, substitute=False, **properties)
@@ -764,6 +798,7 @@ class Input(renpy.text.text.Text): #@UndefinedVariable
         self.changed = changed
 
         self.editable = editable
+        self.pixel_width = pixel_width
 
         caretprops = { 'color' : None }
 
@@ -773,6 +808,7 @@ class Input(renpy.text.text.Text): #@UndefinedVariable
 
         self.caret = renpy.display.image.Solid(xmaximum=1, style=style, **caretprops)
         self.caret_pos = len(self.content)
+        self.old_caret_pos = self.caret_pos
 
         if button:
             self.editable = False
@@ -787,19 +823,12 @@ class Input(renpy.text.text.Text): #@UndefinedVariable
         self.update_text(self.content, self.editable)
 
 
-    def update_text(self, content, editable):
+    def update_text(self, new_content, editable, check_size=False):
 
-        if content != self.content or editable != self.editable:
+        old_content = self.content
+
+        if new_content != self.content or editable != self.editable:
             renpy.display.render.redraw(self, 0)
-
-        if content != self.content:
-            self.content = content
-
-            if self.changed:
-                self.changed(content)
-
-        if content == "":
-            content = u"\u200b"
 
         self.editable = editable
 
@@ -808,12 +837,32 @@ class Input(renpy.text.text.Text): #@UndefinedVariable
         if caret is None:
             caret = self.caret
 
-        if editable:
-            l = len(content)
-            self.set_text([self.prefix, content[0:self.caret_pos].replace("{", "{{"), caret,
-                                        content[self.caret_pos:l].replace("{", "{{"), self.suffix])
-        else:
-            self.set_text([self.prefix, content.replace("{", "{{"), self.suffix ])
+        def set_content(content):
+
+            if content == "":
+                content = u"\u200b"
+
+            if editable:
+                l = len(content)
+                self.set_text([self.prefix, content[0:self.caret_pos].replace("{", "{{"), caret,
+                                            content[self.caret_pos:l].replace("{", "{{"), self.suffix])
+            else:
+                self.set_text([self.prefix, content.replace("{", "{{"), self.suffix ])
+
+        set_content(new_content)
+
+        if check_size and self.pixel_width:
+            w, _h = self.size()
+            if w > self.pixel_width:
+                self.caret_pos = self.old_caret_pos
+                set_content(old_content)
+                return
+
+        if new_content != old_content:
+            self.content = new_content
+
+            if self.changed:
+                self.changed(new_content)
 
     # This is needed to ensure the caret updates properly.
     def set_style_prefix(self, prefix, root):
@@ -829,6 +878,8 @@ class Input(renpy.text.text.Text): #@UndefinedVariable
         self.update_text(self.content, False)
 
     def event(self, ev, x, y, st):
+
+        self.old_caret_pos = self.caret_pos
 
         if not self.editable:
             return None
@@ -889,7 +940,7 @@ class Input(renpy.text.text.Text): #@UndefinedVariable
             content = self.content[0:self.caret_pos] + ev.unicode + self.content[self.caret_pos:l]
             self.caret_pos += 1
 
-            self.update_text(content, self.editable)
+            self.update_text(content, self.editable, check_size=True)
 
             raise renpy.display.core.IgnoreEvent()
 

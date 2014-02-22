@@ -1,4 +1,4 @@
-# Copyright 2004-2013 Tom Rothamel <pytom@bishoujo.us>
+# Copyright 2004-2014 Tom Rothamel <pytom@bishoujo.us>
 #
 # Permission is hereby granted, free of charge, to any person
 # obtaining a copy of this software and associated documentation files
@@ -441,6 +441,21 @@ class MultiBox(Container):
         # The scene list for this widget.
         self.scene_list = None
 
+    def __unicode__(self):
+        layout = self.style.box_layout
+
+        if layout is None:
+            layout = self.default_layout
+
+        if layout == "fixed":
+            return "Fixed"
+        elif layout == "horizontal":
+            return "HBox"
+        elif layout == "vertical":
+            return "VBox"
+        else:
+            return "MultiBox"
+
     def add(self, widget, start_time=None, anim_time=None): # W0221
         super(MultiBox, self).add(widget)
         self.start_times.append(start_time)
@@ -804,7 +819,6 @@ class Window(Container):
     """
 
     def __init__(self, child, style='window', **properties):
-
         super(Window, self).__init__(style=style, **properties)
         if child is not None:
             self.add(child)
@@ -1329,8 +1343,11 @@ class Viewport(Container):
 
         cw, ch = surf.get_size()
 
-        # width = min(cw, width)
-        # height = min(ch, height)
+        if not self.style.xfill:
+            width = min(cw, width)
+
+        if not self.style.yfill:
+            height = min(ch, height)
 
         if self.set_adjustments:
             self.xadjustment.range = max(cw - width, 0)

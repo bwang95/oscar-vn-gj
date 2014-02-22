@@ -1,4 +1,4 @@
-# Copyright 2004-2013 Tom Rothamel <pytom@bishoujo.us>
+# Copyright 2004-2014 Tom Rothamel <pytom@bishoujo.us>
 #
 # Permission is hereby granted, free of charge, to any person
 # obtaining a copy of this software and associated documentation files
@@ -56,7 +56,6 @@ def init_display():
         renpy.display.core.Interface()
         renpy.loader.index_archives()
         renpy.display.im.cache.init()
-        renpy.style.styles_built = True # The styles we use were built in renpy.main.
 
     renpy.ui.reset()
 

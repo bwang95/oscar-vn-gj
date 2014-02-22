@@ -1,4 +1,4 @@
-# Copyright 2004-2013 Tom Rothamel <pytom@bishoujo.us>
+# Copyright 2004-2014 Tom Rothamel <pytom@bishoujo.us>
 #
 # Permission is hereby granted, free of charge, to any person
 # obtaining a copy of this software and associated documentation files
@@ -31,13 +31,13 @@ try:
 except ImportError:
     vc_version = 0
 
-# The tuple giving the version. This needs to be updated when
-# we bump the version.
-#
-# Be sure to change config.version in tutorial/game/options.rpy.
-version_tuple = (6, 16, 5, vc_version)
+# The tuple giving the version number.
+version_tuple = (6, 17, 0, vc_version)
 
-# A verbose string computed from that version.
+# The name of this version.
+version_name = "In This Decade..."
+
+# A verbose string giving the version.
 version = "Ren'Py " + ".".join(str(i) for i in version_tuple)
 
 # Other versions.
@@ -86,8 +86,35 @@ def import_cython():
     import renpy.angle.glrtt_fbo #@UnresolvedImport
     import renpy.angle.gltexture #@UnresolvedImport
 
+    import renpy.styleclass # @UnresolvedImport
+
+def update_path(package):
+    """
+    Update the __path__ of package, to import binary modules from a libexec
+    directory.
+    """
+
+    name = package.__name__.split(".")
+
+    import _renpy #@UnresolvedImport
+    libexec = os.path.dirname(_renpy.__file__)
+    package.__path__.append(os.path.join(libexec, *name))
+
+    # Also find encodings, to deal with the way py2exe lays things out.
+    import encodings
+    libexec = os.path.dirname(encodings.__path__[0])
+    package.__path__.append(os.path.join(libexec, *name))
 
 def import_all():
+
+    # Note: If we add a new update_path, we have to add an equivalent
+    # hook in the renpython hooks dir.
+
+    import renpy # @UnresolvedImport
+
+    update_path(renpy)
+
+    import renpy.arguments # @UnresolvedImport
 
     import renpy.log #@UnresolvedImport
 
@@ -118,34 +145,19 @@ def import_all():
     import renpy.substitutions #@UnresolvedImport
     import renpy.translation #@UnresolvedImport
 
+    import renpy.display # @UnresolvedImport @Reimport
+
+    update_path(renpy.display)
+
     import renpy.display.presplash #@UnresolvedImport
     import renpy.display.pgrender #@UnresolvedImport
     import renpy.display.scale #@UnresolvedImport
     import renpy.display.module #@UnresolvedImport
-
-    def update_path(package):
-        """
-        Update the __path__ of package, to import binary modules from a libexec
-        directory.
-        """
-
-        name = package.__name__.split(".")
-
-        import _renpy #@UnresolvedImport
-        libexec = os.path.dirname(_renpy.__file__)
-        package.__path__.append(os.path.join(libexec, *name))
-
-        # Also find encodings, to deal with the way py2exe lays things out.
-        import encodings
-        libexec = os.path.dirname(encodings.__path__[0])
-        package.__path__.append(os.path.join(libexec, *name))
-
-    update_path(renpy.display)
-
     import renpy.display.render # Most display stuff depends on this. @UnresolvedImport
     import renpy.display.core # object @UnresolvedImport
 
     import renpy.text #@UnresolvedImport
+
     update_path(renpy.text)
 
     import renpy.text.ftfont #@UnresolvedImport
