@@ -61,6 +61,7 @@ label start:
        humans are movin’ in and they have a young’un with them too. You should
        go say hi."
     show Flannery smile with moveinleft
+    play music "../sound/music/Cat Meows.wav"
     f "Hi ya there, neighbor! I’m Flannery. Nice to meet you!"
     menu:
         f "Hi ya there, neighbor! I’m Flannery. Nice to meet you!"
@@ -154,6 +155,7 @@ label start:
         "That sounds like fun. We’ll definitely be there.":
             f " Awesome! I’ll see you there then. Don’t forget to invite Oscar!"
         "Like hell I’ll go there. Go by yourself.":
+            stop music
             show Flannery sad
             f "Why are you bent on ruining my plans? I just wanted to invite you to 
             something nice and fun! You could just give me a chance! 

@@ -1,3 +1,0 @@
-Version 1.02
-Commit e164ae0948757c56d0d89b5e61b19225f2c4c929
-10:25PM CST
