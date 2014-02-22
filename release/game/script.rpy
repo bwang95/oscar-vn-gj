@@ -586,6 +586,13 @@ label BROTHER:
     o "I’m so sorry...tell Rosemary I’m sorry...so sorry..."
     "Oscar! No...I...It's my...! No..."
     hide Scar regret with dissolve
+    show Bernard norm with dissolve
+
+    b "You tried hard to make up for your mistakes."
+    b "It was all for naught, though."
+    b "But despite that, your brother never stopped loving you."
+    b "'till the last."
+
     "-=End=-"
     return
     
