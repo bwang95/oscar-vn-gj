@@ -1,0 +1,8 @@
+OSCAR README
+Rachael Metcalf, Artist and Programmer; rachael.metcalf@utexas.edu
+Becky Pontiff, Writer; bpontiff@gmail.com
+Brian Wang, Programming and Music; b.wang@utexas.edu
+Nicole Muzquiz, Story; not present at time of writing
+
+Github repository: github.com/bwang95/oscar-vn-gj
+Will be hosted on: cs.utexas.edu/~bwang
